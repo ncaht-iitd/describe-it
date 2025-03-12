@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Existing font definitions remain the same */
+
+/* Comprehensive High Contrast Styles */
+body.high-contrast {
+  background-color: black !important;
+  color: yellow !important;
+}
+
+.high-contrast * {
+  color: yellow !important;
+  border-color: white !important;
+}
+
+.high-contrast a {
+  color: cyan !important;
+  text-decoration: underline !important;
+}
+
+.high-contrast img {
+  filter: grayscale(100%) contrast(200%) !important;
+}
+
+.high-contrast button {
+  background-color: yellow !important;
+  color: black !important;
+  border: 2px solid white !important;
+}
+
+.high-contrast select,
+.high-contrast input {
+  background-color: black !important;
+  color: yellow !important;
+  border: 2px solid yellow !important;
+}
+
+.high-contrast .bg-black {
+  background-color: black !important;
+}
+
+.high-contrast .bg-white {
+  background-color: black !important;
+}
+
+.high-contrast .text-white {
+  color: yellow !important;
+}
+
+.high-contrast .text-black {
+  color: yellow !important;
+}
+
+/* Reading Mode */
+.reading-mode {
+  font-family: "Georgia", serif !important;
+  line-height: 1.8 !important;
+  background-color: #f4f4e0 !important;
+  color: #333 !important;
+}
+
+.high-contrast svg {
+  filter: invert(1) !important; /* Invert SVG colors */
+  stroke: yellow !important; /* Ensure stroke color is yellow */
+  fill: yellow !important; /* Ensure fill color is yellow */
+}
+
+.font-poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.font-poppins-normal {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+.font-poppins-bold{
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+.font-alegreya-normal {
+font-family: "Alegreya", serif;
+font-optical-sizing: auto;
+font-weight: 600;
+font-style: normal;
+}
+
+.font-alegreya-light {
+  font-family: "Alegreya", serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
