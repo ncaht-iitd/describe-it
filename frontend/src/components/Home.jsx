@@ -188,55 +188,50 @@ function Home() {
       </div>
 
       {/* About Section - remains unchanged */}
-      <div ref={aboutRef} className="bg-black py-8 md:py-20">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-poppins-bold mb-4 md:mb-8 text-center text-yellow-400">
-            About Us
-          </h2>
-          <div className="max-w-3xl mx-auto font-alegreya-light text-white text-sm md:text-base">
-            <p className="mb-2 md:mb-4">
-              NCAHT (National Center for Assistive Health Technologies) is an
-              initiative of Indian Council for Medical Research (ICMR) led by
-              IIT Delhi and AIIMS Delhi. Our centre shares a collective vision
-              of enabling disability inclusion through assistive technology by
-              developing a range of AT solutions and services designed to ensure
-              that every individual can live their life to the fullest,
-              regardless of their abilities.
-            </p>
-            <h2 className="text-2xl md:text-3xl font-poppins-bold mb-4 md:mb-8 text-center text-yellow-400">
-              Why <span className="text-white">VisionText?</span>
-            </h2>
-            <p className="mb-2 md:mb-4">
-              In today's era everything from day to day activities to education
-              is being digitalized. A major issue which came into light while
-              researching for this project was lack of clarity in image
-              descriptions and alt text for complex concepts such as Geometry.
-              Our website aims to bridge this gap by providing accessible image
-              descriptions for educational materials.
-            </p>
-            <p className="mb-2 md:mb-4">
-              VisionText is making a significant contribution to accessible
-              education by:
-            </p>
-            <ul className="list-disc pl-4 md:pl-6 mb-2 md:mb-4 text-sm md:text-base">
-              <li>
-                Providing detailed descriptions of images found in textbooks
-              </li>
-              <li>
-                Enabling visually impaired students to access visual information
-              </li>
-              <li>Supporting inclusive learning environments</li>
-              <li>
-                Enhancing the overall learning experience for all students
-              </li>
-            </ul>
-            <p className="text-sm md:text-base">
-              By making educational content more accessible, we're taking a step
-              towards ensuring equal opportunities in education for all.
-            </p>
-          </div>
-        </div>
-      </div>
+      <div ref={aboutRef} className="bg-black py-12 md:py-24">
+  <div className="container mx-auto px-6 md:px-12">
+    <h2 className="text-3xl md:text-4xl font-poppins-bold mb-6 md:mb-10 text-center text-yellow-400">
+      About Us
+    </h2>
+    <div className="max-w-3xl mx-auto font-alegreya-light text-white text-xl leading-relaxed">
+      <p className="mb-4 md:mb-6">
+        NCAHT (National Center for Assistive Health Technologies) is an
+        initiative of Indian Council for Medical Research (ICMR) led by
+        IIT Delhi and AIIMS Delhi. Our centre shares a collective vision
+        of enabling disability inclusion through assistive technology by
+        developing a range of AT solutions and services designed to ensure
+        that every individual can live their life to the fullest,
+        regardless of their abilities.
+      </p>
+      <h2 className="text-3xl md:text-4xl font-poppins-bold mb-6 md:mb-10 text-center text-yellow-400">
+        Why <span className="text-white">VisionText?</span>
+      </h2>
+      <p className="mb-4 md:mb-6">
+        In today's era, everything from day-to-day activities to education
+        is being digitalized. A major issue that emerged during our research
+        for this project was the lack of clarity in image descriptions and
+        alt text for complex concepts such as Geometry.
+        Our website aims to bridge this gap by providing accessible image
+        descriptions for educational materials.
+      </p>
+      <p className="mb-4 md:mb-6">
+        VisionText is making a significant contribution to accessible
+        education by:
+      </p>
+      <ul className="list-disc pl-6 md:pl-8 mb-4 md:mb-6">
+        <li className="mb-2">Providing detailed descriptions of images found in textbooks</li>
+        <li className="mb-2">Enabling visually impaired students to access visual information</li>
+        <li className="mb-2">Supporting inclusive learning environments</li>
+        <li className="mb-2">Enhancing the overall learning experience for all students</li>
+      </ul>
+      <p>
+        By making educational content more accessible, we're taking a step
+        towards ensuring equal opportunities in education for all.
+      </p>
+    </div>
+  </div>
+</div>
+
       <div className="bg-white text-black py-8 md:py-16">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-poppins-bold mb-4 md:mb-8 text-center text-yellow-500">
