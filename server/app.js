@@ -1,9 +1,11 @@
 const express = require("express");
+const connectDB = require("./config/db");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const { rateLimit } = require('express-rate-limit');
 const { S3Client } = require("@aws-sdk/client-s3");
+const s3 = require('./config/s3'); 
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const { v4: uuidv4 } = require("uuid");
@@ -12,10 +14,14 @@ const sharp = require("sharp");
 const axios = require("axios");
 
 require("dotenv").config();
-const LibraryRecord = require('./models');
+const LibraryRecord = require('./models/LibraryRecord');
 
 // Initialize Express app
 const app = express();
+
+// Connect to MongoDB
+connectDB();
+
 
 // Middleware
 app.use(cors());
@@ -137,30 +143,6 @@ requiredEnvVars.forEach((varName) => {
     process.exit(1);
   }
 });
-
-const s3 = new S3Client({
-  region: process.env.AWS_S3_REGION,
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
-  },
-});
-
-// MongoDB Connection
-const mongoURI = process.env.MONGODB_URI;
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(async () => {
-    console.log("Connected to MongoDB Atlas");
-    // Add these debug lines
-    const collections = await mongoose.connection.db.listCollections().toArray();
-    console.log("Available collections:", collections.map(c => c.name));
-    const count = await LibraryRecord.countDocuments();
-    console.log("Number of documents in LibraryRecord:", count);
-  })
-  .catch((error) => {
-    console.error("Error connecting to MongoDB Atlas:", error);
-  });
 
 const upload = multer({
   storage: multerS3({
@@ -542,13 +524,17 @@ function calculateSimilarity(query1, query2) {
 }
 
 app.post("/askMore", async (req, res) => {
+  let record;
+  const { fig_no, user_query, language } = req.body;
+
   try {
-    const { fig_no, user_query } = req.body;
+    console.log("Starting to process request");
 
     // Input validation
     if (!fig_no || !user_query) {
       return res.status(400).json({
         error: "Missing required fields",
+        response: "Missing required information. Please provide both figure number and question.",
         details: {
           fig_no: !fig_no ? "Figure number is required" : null,
           user_query: !user_query ? "User query is required" : null
@@ -557,10 +543,11 @@ app.post("/askMore", async (req, res) => {
     }
 
     // Find the document and get existing queries
-    const record = await LibraryRecord.findOne({ fig_no });
+    record = await LibraryRecord.findOne({ fig_no });
     if (!record) {
       return res.status(404).json({
         error: "Figure not found",
+        response: "Sorry, I couldn't find information about that figure. Please check the figure number and try again.",
         details: `No record found for figure number: ${fig_no}`
       });
     }
@@ -584,6 +571,9 @@ app.post("/askMore", async (req, res) => {
         new: user_query,
         similarity: similarQueries[0].similarity
       });
+
+    console.log("Similar queries found:", similarQueries.length);
+    console.log("About to call OpenAI API");
       
       return res.status(200).json({
         response: similarQueries[0].response,
@@ -598,19 +588,21 @@ app.post("/askMore", async (req, res) => {
 
     // Create OpenAI prompt
     const prompt = `Context: ${subject}, ${standard}, Chapter: ${chapter}, Figure ${fig_no}
-
-Original description: "${description}"
-
-Question: "${user_query}"
-
-Provide a brief, direct answer that is:
-1. Screen-reader friendly (no special formatting or symbols)
-2. Under 3 sentences where possible
-3. Uses plain language suitable for grade ${standard}
-4. Focuses only on the specific question asked
-5. Avoids unnecessary repetition of context
-
-Answer the question directly without any introductory phrases or conclusions.`;
+    
+    Original description: "${description}"
+    
+    Question: "${user_query}"
+    
+    Preferred language: ${language || 'en-US'}
+    
+    Provide a brief, direct answer that is:
+    1. Screen-reader friendly (no special formatting or symbols)
+    2. Under 3 sentences where possible
+    3. Uses plain language suitable for grade ${standard}
+    4. Focuses only on the specific question asked
+    5. Avoids unnecessary repetition of context
+    
+    Answer the question directly without any introductory phrases or conclusions.`;
 
     // Get response from OpenAI
     const response = await openai.chat.completions.create({
@@ -630,7 +622,7 @@ Answer the question directly without any introductory phrases or conclusions.`;
     });
 
     const aiResponse = response.choices[0].message.content;
-
+    console.log("OpenAI API response received");
     // Add new query to the document
     await LibraryRecord.findOneAndUpdate(
       { fig_no },
@@ -663,17 +655,29 @@ Answer the question directly without any introductory phrases or conclusions.`;
     console.error("Error processing Ask More request:", error);
     const errorResponse = {
       error: "Error processing your request",
+      response: "Sorry, I encountered a technical issue. Please try again later.",
       success: false,
       details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     };
 
+    // Make sure to use req.body.fig_no instead of fig_no directly if there's a chance
+    // it might not be accessible due to previous errors
+    if (error.message && error.message.includes("No record found")) {
+      errorResponse.error = "Figure not found";
+      errorResponse.response = "Sorry, I couldn't find that figure in our database.";
+      errorResponse.details = `No record found for figure number: ${req.body.fig_no || 'unknown'}`;
+      return res.status(404).json(errorResponse);
+    }
+
     if (error.response?.status === 429) {
       errorResponse.error = "Rate limit exceeded. Please try again later.";
+      errorResponse.response = "I'm getting too many requests right now. Please try again in a moment.";
       return res.status(429).json(errorResponse);
     }
 
     if (error.response?.status === 400) {
       errorResponse.error = "Invalid request to AI service";
+      errorResponse.response = "I couldn't process your question. Please try rephrasing it.";
       return res.status(400).json(errorResponse);
     }
 
