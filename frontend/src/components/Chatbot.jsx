@@ -130,14 +130,18 @@ const Chatbot = ({ figNo, description }) => {
         headers: { 'Content-Type': 'application/json' }
       });
 
-      if (response.data && response.data.response) {
+      if (response.data) {
+        const botMessage = response.data.response || 
+                           response.data.error || 
+                           'I received your message but couldn\'t generate a proper response.';
+        
         setMessages((prev) => [...prev, { 
           type: 'bot', 
-          content: response.data.response,
-          language: 'en-US' // Assuming bot always responds in English
+          content: botMessage,
+          language: response.data.language || 'en-US'
         }]);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error('Empty response received');
       }
     } catch (error) {
       console.error('Chat error:', error);
