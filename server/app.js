@@ -22,9 +22,25 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log('Request received:', {
+    method: req.method,
+    path: req.path,
+    origin: req.headers.origin,
+    contentType: req.headers['content-type']
+  });
+  next();
+}); 
 
 // Middleware
-app.use(cors());
+// CORS configuration - replace your current app.use(cors()) with this
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com/', '*'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -288,6 +304,11 @@ app.post("/upload", async (req, res) => {
 
 app.get("/", async (req, res) => {
   res.status(200).json({ msg: "Server running sussessfully..." });
+});
+
+// Add a simple test endpoint
+app.get('/ping', (req, res) => {
+  return res.json({ success: true, response: 'pong' });
 });
 
 // GET THE OVERALL DATA LIST FOR CLASS CHAPTER SUBJECT AND FIG No.

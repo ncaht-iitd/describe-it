@@ -122,12 +122,23 @@ const Chatbot = ({ figNo, description }) => {
     setIsLoading(true);
 
     try {
+      console.log('About to send request with data:', {
+        fig_no: figNo,
+        user_query_length: userInput.length
+      });
+
       const response = await axios.post('/askMore', {
         fig_no: figNo,
         user_query: userMessage,
         language: selectedLanguage // Send the language to the backend
       }, {
         headers: { 'Content-Type': 'application/json' }
+      });
+
+      console.log('Raw response received:', {
+        status: response.status,
+        hasData: !!response.data,
+        dataKeys: response.data ? Object.keys(response.data) : []
       });
 
       if (response.data) {
@@ -144,7 +155,13 @@ const Chatbot = ({ figNo, description }) => {
         throw new Error('Empty response received');
       }
     } catch (error) {
-      console.error('Chat error:', error);
+      console.error('Detailed chat error:', {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        isAxiosError: error.isAxiosError
+      });
       setMessages((prev) => [...prev, { 
         type: 'bot', 
         content: 'Sorry, I encountered an error. Please try again.',
