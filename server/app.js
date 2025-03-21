@@ -36,9 +36,10 @@ app.use((req, res, next) => {
 // Middleware
 // CORS configuration - replace your current app.use(cors()) with this
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com/', '*'],
+  origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com', '*'],
   methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 app.use(bodyParser.urlencoded({ extended: true }));
