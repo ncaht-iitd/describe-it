@@ -3,18 +3,25 @@ const connectDB = require("./config/db");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
+
 const { rateLimit } = require('express-rate-limit');
 const { S3Client } = require("@aws-sdk/client-s3");
 const s3 = require('./config/s3'); 
+
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 const { v4: uuidv4 } = require("uuid");
+
 const OpenAI = require("openai");
 const sharp = require("sharp");
+
 const axios = require("axios");
 
+const { getOpenAIResponse } = require('./services/openai');
+const addQuery = require('./services/addQuery');
+
 require("dotenv").config();
-const LibraryRecord = require('./models/LibraryRecord');
+const LibraryRecord = require('./models/LibraryRecord'); 
 
 // Initialize Express app
 const app = express();
@@ -34,7 +41,6 @@ app.use((req, res, next) => {
 }); 
 
 // Middleware
-// CORS configuration - replace your current app.use(cors()) with this
 app.use(cors({
   origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com', '*'],
   methods: ['GET', 'POST', 'OPTIONS'],
@@ -54,34 +60,10 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-const addQuery = async (fig_no, query, response, keywords) => {
-  try {
-    const result = await LibraryRecord.findOneAndUpdate(
-      { fig_no },
-      { 
-        $push: { 
-          queries: {
-            query,
-            response,
-            keywords,
-            timestamp: new Date()
-          }
-        }
-      },
-      { new: true }
-    );
-    return result;
-  } catch (error) {
-    console.error('Error adding query:', error);
-    throw error;
-  }
-};
-
 // Modified route handler for askMore
 const handleAskMore = async (req, res) => {
   try {
-    const { fig_no, user_query } = req.body;
-
+    const { fig_no, user_query, language = 'en-US' } = req.body;
     // Input validation
     if (!fig_no || !user_query) {
       return res.status(400).json({
@@ -118,15 +100,15 @@ const handleAskMore = async (req, res) => {
     }
 
     // If no similar queries, proceed with OpenAI
-    const aiResponse = await getOpenAIResponse(record, user_query);
-    
-    // Add the new query to the document
-    await addQuery(fig_no, user_query, aiResponse, extractKeywords(user_query));
+    const aiResponse = await getOpenAIResponse(record, user_query, language);
 
+    await addQuery(fig_no, user_query, aiResponse, extractKeywords(user_query), language);
+    
     return res.status(200).json({
       response: aiResponse,
       success: true,
-      cached: false
+      cached: false,
+      language
     });
 
   } catch (error) {
@@ -545,167 +527,169 @@ function calculateSimilarity(query1, query2) {
   return combinedSimilarity;
 }
 
-app.post("/askMore", async (req, res) => {
-  let record;
-  const { fig_no, user_query, language } = req.body;
+// app.post("/askMore", async (req, res) => {
+//   let record;
+//   const { fig_no, user_query, language } = req.body;
 
-  try {
-    console.log("Starting to process request");
+//   try {
+//     console.log("Starting to process request");
 
-    // Input validation
-    if (!fig_no || !user_query) {
-      return res.status(400).json({
-        error: "Missing required fields",
-        response: "Missing required information. Please provide both figure number and question.",
-        details: {
-          fig_no: !fig_no ? "Figure number is required" : null,
-          user_query: !user_query ? "User query is required" : null
-        }
-      });
-    }
+//     // Input validation
+//     if (!fig_no || !user_query) {
+//       return res.status(400).json({
+//         error: "Missing required fields",
+//         response: "Missing required information. Please provide both figure number and question.",
+//         details: {
+//           fig_no: !fig_no ? "Figure number is required" : null,
+//           user_query: !user_query ? "User query is required" : null
+//         }
+//       });
+//     }
 
-    // Find the document and get existing queries
-    record = await LibraryRecord.findOne({ fig_no });
-    if (!record) {
-      return res.status(404).json({
-        error: "Figure not found",
-        response: "Sorry, I couldn't find information about that figure. Please check the figure number and try again.",
-        details: `No record found for figure number: ${fig_no}`
-      });
-    }
+//     // Find the document and get existing queries
+//     record = await LibraryRecord.findOne({ fig_no });
+//     if (!record) {
+//       return res.status(404).json({
+//         error: "Figure not found",
+//         response: "Sorry, I couldn't find information about that figure. Please check the figure number and try again.",
+//         details: `No record found for figure number: ${fig_no}`
+//       });
+//     }
 
-    // Get existing queries from the document
-    const existingQueries = record.queries || [];
+//     // Get existing queries from the document
+//     const existingQueries = record.queries || [];
     
-    // Check for similar queries
-    const similarityThreshold = 0.5;
-    const similarQueries = existingQueries
-      .map(query => ({
-        ...query.toObject(),
-        similarity: calculateSimilarity(query.query, user_query)
-      }))
-      .filter(query => query.similarity > similarityThreshold)
-      .sort((a, b) => b.similarity - a.similarity);
+//     // Check for similar queries
+//     const similarityThreshold = 0.5;
+//     const similarQueries = existingQueries
+//       .map(query => ({
+//         ...query.toObject(),
+//         similarity: calculateSimilarity(query.query, user_query)
+//       }))
+//       .filter(query => query.similarity > similarityThreshold)
+//       .sort((a, b) => b.similarity - a.similarity);
 
-    if (similarQueries.length > 0) {
-      console.log('Similar query found:', {
-        original: similarQueries[0].query,
-        new: user_query,
-        similarity: similarQueries[0].similarity
-      });
+//     if (similarQueries.length > 0) {
+//       console.log('Similar query found:', {
+//         original: similarQueries[0].query,
+//         new: user_query,
+//         similarity: similarQueries[0].similarity
+//       });
 
-    console.log("Similar queries found:", similarQueries.length);
-    console.log("About to call OpenAI API");
+//     console.log("Similar queries found:", similarQueries.length);
+//     console.log("About to call OpenAI API");
       
-      return res.status(200).json({
-        response: similarQueries[0].response,
-        success: true,
-        cached: true,
-        similarityScore: similarQueries[0].similarity,
-        originalQuery: similarQueries[0].query
-      });
-    }
+//       return res.status(200).json({
+//         response: similarQueries[0].response,
+//         success: true,
+//         cached: true,
+//         similarityScore: similarQueries[0].similarity,
+//         originalQuery: similarQueries[0].query
+//       });
+//     }
 
-    const { description, subject, chapter, standard } = record;
+//     const { description, subject, chapter, standard } = record;
 
-    // Create OpenAI prompt
-    const prompt = `Context: ${subject}, ${standard}, Chapter: ${chapter}, Figure ${fig_no}
+//     // Create OpenAI prompt
+//     const prompt = `Context: ${subject}, ${standard}, Chapter: ${chapter}, Figure ${fig_no}
     
-    Original description: "${description}"
+//     Original description: "${description}"
     
-    Question: "${user_query}"
+//     Question: "${user_query}"
     
-    Preferred language: ${language || 'en-US'}
+//     Preferred language: ${language || 'en-US'}
     
-    Provide a brief, direct answer that is:
-    1. Screen-reader friendly (no special formatting or symbols)
-    2. Under 3 sentences where possible
-    3. Uses plain language suitable for grade ${standard}
-    4. Focuses only on the specific question asked
-    5. Avoids unnecessary repetition of context
+//     Provide a brief, direct answer that is:
+//     1. Screen-reader friendly (no special formatting or symbols)
+//     2. Under 3 sentences where possible
+//     3. Uses plain language suitable for grade ${standard}
+//     4. Focuses only on the specific question asked
+//     5. Avoids unnecessary repetition of context
     
-    Answer the question directly without any introductory phrases or conclusions.`;
+//     Answer the question directly without any introductory phrases or conclusions.`;
 
-    // Get response from OpenAI
-    const response = await openai.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content: "You are a concise mathematics teacher. Provide brief, clear answers without formatting, markdown, or special characters. Focus on essential information only."
-        },
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      temperature: 0.3,
-      max_tokens: 200
-    });
+//     // Get response from OpenAI
+//     const response = await openai.chat.completions.create({
+//       model: "gpt-4o",
+//       messages: [
+//         {
+//           role: "system",
+//           content: "You are a concise mathematics teacher. Provide brief, clear answers without formatting, markdown, or special characters. Focus on essential information only."
+//         },
+//         {
+//           role: "user",
+//           content: prompt
+//         }
+//       ],
+//       temperature: 0.3,
+//       max_tokens: 200
+//     });
 
-    const aiResponse = response.choices[0].message.content;
-    console.log("OpenAI API response received");
-    // Add new query to the document
-    await LibraryRecord.findOneAndUpdate(
-      { fig_no },
-      {
-        $push: {
-          queries: {
-            query: user_query,
-            response: aiResponse,
-            keywords: extractKeywords(user_query),
-            timestamp: new Date()
-          }
-        }
-      },
-      { new: true }
-    );
+//     const aiResponse = response.choices[0].message.content;
+//     console.log("OpenAI API response received");
+//     // Add new query to the document
+//     await LibraryRecord.findOneAndUpdate(
+//       { fig_no },
+//       {
+//         $push: {
+//           queries: {
+//             query: user_query,
+//             response: aiResponse,
+//             keywords: extractKeywords(user_query),
+//             timestamp: new Date()
+//           }
+//         }
+//       },
+//       { new: true }
+//     );
 
-    console.log('New query logged:', {
-      fig_no,
-      query: user_query,
-      keywords: extractKeywords(user_query)
-    });
+//     console.log('New query logged:', {
+//       fig_no,
+//       query: user_query,
+//       keywords: extractKeywords(user_query)
+//     });
 
-    return res.status(200).json({
-      response: aiResponse,
-      success: true,
-      cached: false
-    });
+//     return res.status(200).json({
+//       response: aiResponse,
+//       success: true,
+//       cached: false
+//     });
 
-  } catch (error) {
-    console.error("Error processing Ask More request:", error);
-    const errorResponse = {
-      error: "Error processing your request",
-      response: "Sorry, I encountered a technical issue. Please try again later.",
-      success: false,
-      details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-    };
+//   } catch (error) {
+//     console.error("Error processing Ask More request:", error);
+//     const errorResponse = {
+//       error: "Error processing your request",
+//       response: "Sorry, I encountered a technical issue. Please try again later.",
+//       success: false,
+//       details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     };
 
-    // Make sure to use req.body.fig_no instead of fig_no directly if there's a chance
-    // it might not be accessible due to previous errors
-    if (error.message && error.message.includes("No record found")) {
-      errorResponse.error = "Figure not found";
-      errorResponse.response = "Sorry, I couldn't find that figure in our database.";
-      errorResponse.details = `No record found for figure number: ${req.body.fig_no || 'unknown'}`;
-      return res.status(404).json(errorResponse);
-    }
+//     // Make sure to use req.body.fig_no instead of fig_no directly if there's a chance
+//     // it might not be accessible due to previous errors
+//     if (error.message && error.message.includes("No record found")) {
+//       errorResponse.error = "Figure not found";
+//       errorResponse.response = "Sorry, I couldn't find that figure in our database.";
+//       errorResponse.details = `No record found for figure number: ${req.body.fig_no || 'unknown'}`;
+//       return res.status(404).json(errorResponse);
+//     }
 
-    if (error.response?.status === 429) {
-      errorResponse.error = "Rate limit exceeded. Please try again later.";
-      errorResponse.response = "I'm getting too many requests right now. Please try again in a moment.";
-      return res.status(429).json(errorResponse);
-    }
+//     if (error.response?.status === 429) {
+//       errorResponse.error = "Rate limit exceeded. Please try again later.";
+//       errorResponse.response = "I'm getting too many requests right now. Please try again in a moment.";
+//       return res.status(429).json(errorResponse);
+//     }
 
-    if (error.response?.status === 400) {
-      errorResponse.error = "Invalid request to AI service";
-      errorResponse.response = "I couldn't process your question. Please try rephrasing it.";
-      return res.status(400).json(errorResponse);
-    }
+//     if (error.response?.status === 400) {
+//       errorResponse.error = "Invalid request to AI service";
+//       errorResponse.response = "I couldn't process your question. Please try rephrasing it.";
+//       return res.status(400).json(errorResponse);
+//     }
 
-    return res.status(500).json(errorResponse);
-  }
-});
+//     return res.status(500).json(errorResponse);
+//   }
+// });
+
+app.post("/askMore", handleAskMore);
 
 app.get("/test/logs", async (req, res) => {
   try {

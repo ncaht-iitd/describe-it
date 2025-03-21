@@ -13,6 +13,7 @@ const LibraryRecordSchema = new mongoose.Schema({
     query: String,
     response: String,
     keywords: [String],
+    language: String,
     timestamp: { type: Date, default: Date.now }
   }]
 });
