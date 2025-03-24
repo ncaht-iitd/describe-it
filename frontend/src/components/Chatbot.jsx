@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Send, Mic, X, Globe } from 'lucide-react';
 import axios from 'axios';
+import { baseURI } from "../config/config";  // Update with the correct path
 
 // Language configuration
 const LANGUAGES = {
@@ -111,66 +112,50 @@ const Chatbot = ({ figNo, description }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!userInput.trim() || !figNo) return;
-
+    
     const userMessage = userInput;
     setUserInput('');
     setMessages((prev) => [...prev, { 
-      type: 'user', 
-      content: userMessage,
-      language: selectedLanguage // Store the language used for this message
+        type: 'user', 
+        content: userMessage, 
+        language: selectedLanguage 
     }]);
+    
     setIsLoading(true);
-
+    
     try {
-      console.log('About to send request with data:', {
-        fig_no: figNo,
-        user_query_length: userInput.length
-      });
-
-      const response = await axios.post('/askMore', {
-        fig_no: figNo,
-        user_query: userMessage,
-        language: selectedLanguage // Send the language to the backend
-      }, {
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      console.log('Raw response received:', {
-        status: response.status,
-        hasData: !!response.data,
-        dataKeys: response.data ? Object.keys(response.data) : []
-      });
-
-      if (response.data) {
-        const botMessage = response.data.response || 
-                           response.data.error || 
-                           'I received your message but couldn\'t generate a proper response.';
+        // Use the full URL path
+        const response = await axios.post(`${baseURI}/askMore`, {
+            fig_no: figNo,
+            user_query: userMessage,
+            language: selectedLanguage
+        }, {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
         
-        setMessages((prev) => [...prev, { 
-          type: 'bot', 
-          content: botMessage,
-          language: response.data.language || 'en-US'
-        }]);
-      } else {
-        throw new Error('Empty response received');
-      }
+        if (response.data) {
+            const botMessage = response.data.response || response.data.error || 'No proper response received';
+            setMessages((prev) => [...prev, { 
+                type: 'bot', 
+                content: botMessage, 
+                language: response.data.language || 'en-US' 
+            }]);
+        } else {
+            throw new Error('Empty response received');
+        }
     } catch (error) {
-      console.error('Detailed chat error:', {
-        message: error.message,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        data: error.response?.data,
-        isAxiosError: error.isAxiosError
-      });
-      setMessages((prev) => [...prev, { 
-        type: 'bot', 
-        content: 'Sorry, I encountered an error. Please try again.',
-        language: 'en-US'
-      }]);
+        console.error('Chat error details:', error);
+        setMessages((prev) => [...prev, { 
+            type: 'bot', 
+            content: 'Sorry, I encountered an error. Please try again.', 
+            language: 'en-US' 
+        }]);
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   return (
     <div className="fixed bottom-4 right-4 z-50">

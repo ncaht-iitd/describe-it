@@ -29,6 +29,22 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// Middleware
+// app.use(cors({
+// origin: '*',
+// methods: ['GET', 'POST', 'OPTIONS'],
+// allowedHeaders: ['Content-Type']
+// }));
+
+app.use(cors({
+  origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com', '*'],
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+app.options('*', cors()); // Enable pre-flight for all routes
+
 // Add request logging middleware
 app.use((req, res, next) => {
   console.log('Request received:', {
@@ -40,13 +56,9 @@ app.use((req, res, next) => {
   next();
 }); 
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com', '*'],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+app.get('/cors-test', cors(), (req, res) => {
+  res.json({ message: 'CORS is working!' });
+});
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -699,6 +711,14 @@ app.get("/test/logs", async (req, res) => {
   } catch (error) {
     console.error('Error fetching logs:', error);
     res.status(500).json({ error: "Failed to fetch logs" });
+  }
+});
+
+// Add this after all your routes are registered
+console.log('Registered routes:');
+app._router.stack.forEach(r => {
+  if (r.route && r.route.path) {
+    console.log(`${Object.keys(r.route.methods)} ${r.route.path}`);
   }
 });
 

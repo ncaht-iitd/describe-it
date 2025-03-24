@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const baseURI = import.meta.env.VITE_BACKEND_URL
+export const baseURI = import.meta.env.VITE_BACKEND_URL; 
+
+console.log("CHECKPOINT: baseURI is set to:", baseURI);
 
 export async function getData(){
     console.log("GET DATA CALLED IN CONGI")
@@ -37,7 +39,7 @@ export async function getImageDescription(grade, subject, chapter, figNo) {
 
 export async function updateUserReview(userReview, grade, subject, chapter, figNo) {
   try {
-    const res =   axios({
+    const res = await axios({
       // Endpoint to send files
       url: `${baseURI}/review`,
       method: "POST",
@@ -50,7 +52,7 @@ export async function updateUserReview(userReview, grade, subject, chapter, figN
         figNo: figNo,
       },
     })
-    console.log("REview ADDED TO DB",res);
+    console.log("REVIEW ADDED TO DB",res);
     return res;
 
   } catch (e) {
@@ -79,5 +81,28 @@ export const uploadImage = async (file, email, metadata) => {
 
   return await response.json();
 };
+
+// Function to call the /askMore endpoint
+export async function askMore(figNo, userMessage, selectedLanguage) {
+  console.log("CHECKPOINT: askMore() function is being called!"); 
+  const apiURL = `${baseURI}/askMore`;
+  console.log("CHECKPOINT: API URL for askMore():", apiURL);
+  try {
+    const response = await axios.post(apiURL, {
+      fig_no: figNo,
+      user_query: userMessage,
+      language: selectedLanguage,
+    }, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    console.log("ASKMORE API RESPONSE:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("ERROR IN ASKMORE API:", error);
+    throw error;
+  }
+}
+
 
 export default getImageDescription;
