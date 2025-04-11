@@ -5,5 +5,10 @@ export default defineConfig({
     plugins: [react()],
     server: {
         proxy: {} 
-    }
+    },
+    build: {
+        rollupOptions: {
+          external: ['appwrite'],
+        },
+      },
 });
