@@ -1,0 +1,45 @@
+{
+  "summary": {
+    "total": 6,
+    "successful": 6,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class7_geography_ch7_lifeInDeserts_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_1.png",
+      "key": "Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_1.png"
+    },
+    {
+      "fileName": "class7_geography_ch7_lifeInDeserts_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_2.png",
+      "key": "Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_2.png"
+    },
+    {
+      "fileName": "class7_geography_ch7_lifeInDeserts_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_3.png",
+      "key": "Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_3.png"
+    },
+    {
+      "fileName": "class7_geography_ch7_lifeInDeserts_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_4.png",
+      "key": "Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_4.png"
+    },
+    {
+      "fileName": "class7_geography_ch7_lifeInDeserts_diagram_5.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_5.png",
+      "key": "Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_5.png"
+    },
+    {
+      "fileName": "class7_geography_ch7_lifeInDeserts_diagram_6.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_6.png",
+      "key": "Geography/Class-7/class7_geography_ch7_lifeInDeserts_diagram_6.png"
+    }
+  ]
+}

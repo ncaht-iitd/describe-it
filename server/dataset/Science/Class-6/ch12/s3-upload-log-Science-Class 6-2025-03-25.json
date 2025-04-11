@@ -1,0 +1,99 @@
+{
+  "summary": {
+    "total": 15,
+    "successful": 15,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_1.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_1.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_10.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_10.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_10.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_11.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_11.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_11.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_12.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_12.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_12.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_13.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_13.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_13.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_14.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_14.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_14.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_15.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_15.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_15.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_2.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_2.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_3.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_3.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_4.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_4.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_5.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_5.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_5.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_6.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_6.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_6.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_7.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_7.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_7.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_8.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_8.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_8.png"
+    },
+    {
+      "fileName": "class6_Science_ch12_beyondEarth_diagram_9.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 6/class6_Science_ch12_beyondEarth_diagram_9.png",
+      "key": "Science/Class 6/class6_Science_ch12_beyondEarth_diagram_9.png"
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "summary": {
+    "total": 6,
+    "successful": 6,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class7_Science_ch13_wastewater_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 7/class7_Science_ch13_wastewater_diagram_1.png",
+      "key": "Science/Class 7/class7_Science_ch13_wastewater_diagram_1.png"
+    },
+    {
+      "fileName": "class7_Science_ch13_wastewater_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 7/class7_Science_ch13_wastewater_diagram_2.png",
+      "key": "Science/Class 7/class7_Science_ch13_wastewater_diagram_2.png"
+    },
+    {
+      "fileName": "class7_Science_ch13_wastewater_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 7/class7_Science_ch13_wastewater_diagram_3.png",
+      "key": "Science/Class 7/class7_Science_ch13_wastewater_diagram_3.png"
+    },
+    {
+      "fileName": "class7_Science_ch13_wastewater_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 7/class7_Science_ch13_wastewater_diagram_4.png",
+      "key": "Science/Class 7/class7_Science_ch13_wastewater_diagram_4.png"
+    },
+    {
+      "fileName": "class7_Science_ch13_wastewater_diagram_5.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 7/class7_Science_ch13_wastewater_diagram_5.png",
+      "key": "Science/Class 7/class7_Science_ch13_wastewater_diagram_5.png"
+    },
+    {
+      "fileName": "class7_Science_ch13_wastewater_diagram_6.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 7/class7_Science_ch13_wastewater_diagram_6.png",
+      "key": "Science/Class 7/class7_Science_ch13_wastewater_diagram_6.png"
+    }
+  ]
+}

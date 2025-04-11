@@ -1,0 +1,57 @@
+{
+  "summary": {
+    "total": 8,
+    "successful": 8,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_1.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_1.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_2.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_2.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_3.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_3.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_4.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_4.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_5.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_5.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_5.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_6.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_6.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_6.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_7.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_7.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_7.png"
+    },
+    {
+      "fileName": "class8_geography_ch5_humanResources_diagram_8.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Geography/Class-8/class8_geography_ch5_humanResources_diagram_8.png",
+      "key": "Geography/Class-8/class8_geography_ch5_humanResources_diagram_8.png"
+    }
+  ]
+}

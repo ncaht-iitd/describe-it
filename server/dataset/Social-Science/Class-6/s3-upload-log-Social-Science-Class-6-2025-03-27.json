@@ -1,0 +1,33 @@
+{
+  "summary": {
+    "total": 4,
+    "successful": 4,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_1.png",
+      "key": "Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_1.png"
+    },
+    {
+      "fileName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_2.png",
+      "key": "Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_2.png"
+    },
+    {
+      "fileName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_3.png",
+      "key": "Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_3.png"
+    },
+    {
+      "fileName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_4.png",
+      "key": "Social-Science/Class-6/class6_sst_ch12_localGovtInUrbanAreas_diagram_4.png"
+    }
+  ]
+}

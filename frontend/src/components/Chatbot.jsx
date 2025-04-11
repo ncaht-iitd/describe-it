@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Send, Mic, X, Globe } from 'lucide-react';
 import axios from 'axios';
-import { baseURI } from "../config/config";  // Update with the correct path
+import { baseURI, askMore } from "../api/config";  // Update with the correct path
 
 // Language configuration
 const LANGUAGES = {
@@ -15,7 +15,7 @@ const LANGUAGES = {
   // 'de-DE': { label: 'German', nativeName: 'Deutsch' },
 };
 
-const Chatbot = ({ figNo, description }) => {
+const Chatbot = ({ figNo, description, imageData }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [userInput, setUserInput] = useState('');
@@ -26,6 +26,26 @@ const Chatbot = ({ figNo, description }) => {
   
   // Use useRef to maintain reference throughout component lifecycle
   const recognitionRef = useRef(null);
+
+  // Check if we have valid image data for chat
+  const hasValidData = imageData && imageData.subject && imageData.standard && imageData.chapter;
+  const hasIdentifier = figNo || imageData?.image_name;
+
+  // Debug log for props
+  useEffect(() => {
+    console.log('Chatbot props:', {
+      figNo: figNo || 'Not provided',
+      hasDescription: !!description,
+      imageData: {
+        subject: imageData?.subject,
+        standard: imageData?.standard,
+        chapter: imageData?.chapter?.name,
+        image_name: imageData?.image_name,
+        hasValidData,
+        hasIdentifier
+      }
+    });
+  }, [figNo, description, imageData, hasValidData, hasIdentifier]);
 
   // Initialize or reset speech recognition when language changes
   useEffect(() => {
@@ -111,7 +131,7 @@ const Chatbot = ({ figNo, description }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!userInput.trim() || !figNo) return;
+    if (!userInput.trim() || !hasValidData) return;
     
     const userMessage = userInput;
     setUserInput('');
@@ -124,23 +144,24 @@ const Chatbot = ({ figNo, description }) => {
     setIsLoading(true);
     
     try {
-        // Use the full URL path
-        const response = await axios.post(`${baseURI}/askMore`, {
-            fig_no: figNo,
-            user_query: userMessage,
-            language: selectedLanguage
-        }, {
-            headers: {
-                'Content-Type': 'application/json'
+        const response = await askMore(
+            figNo || imageData?.image_name || 'unknown',
+            userMessage,
+            selectedLanguage,
+            {
+                subject: imageData.subject,
+                standard: imageData.standard,
+                chapter: imageData.chapter?.name,
+                identifier_type: figNo ? 'figure' : 'image'
             }
-        });
+        );
         
-        if (response.data) {
-            const botMessage = response.data.response || response.data.error || 'No proper response received';
+        if (response) {
+            const botMessage = response.response || response.error || 'No proper response received';
             setMessages((prev) => [...prev, { 
                 type: 'bot', 
                 content: botMessage, 
-                language: response.data.language || 'en-US' 
+                language: response.language || 'en-US' 
             }]);
         } else {
             throw new Error('Empty response received');
@@ -149,13 +170,13 @@ const Chatbot = ({ figNo, description }) => {
         console.error('Chat error details:', error);
         setMessages((prev) => [...prev, { 
             type: 'bot', 
-            content: 'Sorry, I encountered an error. Please try again.', 
+            content: error.response?.data?.error || 'Sorry, I encountered an error. Please try again.', 
             language: 'en-US' 
         }]);
     } finally {
         setIsLoading(false);
     }
-};
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -172,7 +193,9 @@ const Chatbot = ({ figNo, description }) => {
         <div className="bg-white rounded-lg shadow-xl w-96 h-[500px] flex flex-col">
           <div className="flex justify-between items-center p-4 border-b">
             <h3 className="font-semibold text-gray-800">
-              Ask More Questions {figNo && `(Figure ${figNo})`}
+              Ask More Questions {figNo ? `(Figure ${figNo})` : 
+                imageData?.image_name ? `(Diagram ${imageData.image_name.split(/[_-]/).pop().replace(/\.[^/.]+$/, "")})` : 
+                ''}
             </h3>
             <div className="flex items-center space-x-2">
               <div className="relative">
@@ -242,18 +265,18 @@ const Chatbot = ({ figNo, description }) => {
                 type="text"
                 value={userInput}
                 onChange={(e) => setUserInput(e.target.value)}
-                placeholder={figNo 
+                placeholder={hasValidData
                   ? `Type your question in ${LANGUAGES[selectedLanguage]?.label || 'selected language'}...` 
-                  : "Please select a figure first"
+                  : "Please wait for image data to load..."
                 }
                 className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                disabled={isLoading || !figNo}
+                disabled={isLoading || !hasValidData}
               />
               <button
                 type="button"
                 onClick={startListening}
                 className={`p-2 rounded-lg ${isListening ? 'bg-red-500 text-white' : 'bg-gray-200'} hover:bg-gray-300`}
-                disabled={isLoading || !figNo}
+                disabled={isLoading || !hasValidData}
                 aria-label={`Start voice input in ${LANGUAGES[selectedLanguage]?.label || 'selected language'}`}
                 title={`Click to speak in ${LANGUAGES[selectedLanguage]?.label || 'selected language'}`}
               >
@@ -262,7 +285,7 @@ const Chatbot = ({ figNo, description }) => {
               <button
                 type="submit"
                 className="bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-                disabled={isLoading || !userInput.trim() || !figNo}
+                disabled={isLoading || !userInput.trim() || !hasValidData}
                 aria-label="Send message"
               >
                 <Send className="w-5 h-5" />

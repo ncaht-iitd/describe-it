@@ -1,0 +1,113 @@
+{
+  "summary": {
+    "total": 26,
+    "successful": 26,
+    "failed": 0
+  },
+  "results": [
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_1.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_10.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_11.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_12.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_13.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_14.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_15.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_16.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_17.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_18.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_19.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_2.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_20.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_21.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_22.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_23.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_24.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_25.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_26.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_3.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_4.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_5.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_6.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_7.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_8.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_maths_ch13_solidShapes_diagram_9.png",
+      "status": "success"
+    }
+  ]
+}

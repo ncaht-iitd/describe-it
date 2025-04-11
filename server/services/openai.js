@@ -1,11 +1,22 @@
 const { OpenAI } = require("openai");
+
 const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
     try {
+      // Validate OpenAI API key
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error("OpenAI API key is not configured");
+      }
+
       // Configure your OpenAI API integration
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY
       });
       
+      // Validate record
+      if (!record) {
+        throw new Error("No record provided");
+      }
+
       // Destructure all needed fields from the record
       const { description, subject, chapter, standard, image_url, title, fig_no } = record;
       
@@ -17,7 +28,7 @@ const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
       const messages = [
         {
           role: "system", 
-          content: "You are a concise mathematics teacher helping visually impaired and blind students. Provide brief, clear answers without formatting, markdown, or special characters. Focus on essential information only."
+          content: "You are a concise VI teacher helping visually impaired and blind students. Provide brief, clear answers without formatting, markdown, or special characters. Focus on essential information only."
         },
         {
           role: "user",
@@ -52,9 +63,11 @@ const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
         }
       ];
       
+      console.log('Making OpenAI API call with model: gpt-4o');
+      
       // Make the API call to OpenAI using GPT-4 Vision
       const response = await openai.chat.completions.create({
-        model: "gpt-4.5-preview",
+        model: "gpt-4o-mini",
         messages: messages,
         temperature: 0.3,
         max_tokens: 200
@@ -63,9 +76,14 @@ const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
       // Extract and return the AI response text
       return response.choices[0].message.content;
     } catch (error) {
-      console.error("Error in OpenAI call:", error);
-      throw new Error("Failed to get response from AI service: " + error.message);
+      console.error("Error in OpenAI call:", {
+        message: error.message,
+        code: error.code,
+        type: error.type,
+        stack: error.stack
+      });
+      throw new Error(`Failed to get response from AI service: ${error.message}`);
     }
-  };
+};
 
-  module.exports = { getOpenAIResponse };
+module.exports = { getOpenAIResponse };

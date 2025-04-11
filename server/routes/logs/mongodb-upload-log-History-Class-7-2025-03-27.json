@@ -1,0 +1,50 @@
+{
+  "summary": {
+    "total": 10,
+    "successful": 9,
+    "failed": 1
+  },
+  "results": [
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_1.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_10.png",
+      "status": "error",
+      "error": "LibraryRecord validation failed: image_url: Path `image_url` is required."
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_2.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_3.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_4.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_5.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_6.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_7.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_8.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_history_ch8_18thCenturyPoliticalFormations_diagram_9.png",
+      "status": "success"
+    }
+  ]
+}

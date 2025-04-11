@@ -96,3 +96,232 @@ font-style: normal;
   font-weight: 400;
   font-style: normal;
 }
+
+/* Search Form Styles */
+.search-form-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.search-form-container h2 {
+  text-align: center;
+  color: #1a1a1a;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.search-type-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.toggle-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: white;
+  color: #4b5563;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-btn.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: white;
+  color: #1f2937;
+  font-size: 1rem;
+  transition: border-color 0.2s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-group select:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.search-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: #2563eb;
+}
+
+.search-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* High Contrast Mode Styles for Search Form */
+.high-contrast .search-form-container {
+  background-color: black !important;
+  border: 2px solid yellow !important;
+}
+
+.high-contrast .search-form-container h2 {
+  color: yellow !important;
+}
+
+.high-contrast .toggle-btn {
+  background-color: black !important;
+  color: yellow !important;
+  border-color: yellow !important;
+}
+
+.high-contrast .toggle-btn.active {
+  background-color: yellow !important;
+  color: black !important;
+  border-color: yellow !important;
+}
+
+.high-contrast .form-group label {
+  color: yellow !important;
+}
+
+.high-contrast .form-group select,
+.high-contrast .form-group input {
+  background-color: black !important;
+  color: yellow !important;
+  border-color: yellow !important;
+}
+
+.high-contrast .search-button {
+  background-color: yellow !important;
+  color: black !important;
+}
+
+.high-contrast .search-button:hover {
+  background-color: #ffff00 !important;
+}
+
+/* Reading Mode Styles for Search Form */
+.reading-mode .search-form-container {
+  background-color: #f4f4e0 !important;
+  font-family: "Georgia", serif !important;
+}
+
+.reading-mode .form-group select,
+.reading-mode .form-group input {
+  font-family: "Georgia", serif !important;
+  font-size: 1.1rem !important;
+}
+
+/* Navbar Positioning */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 0.5rem 1rem;
+}
+
+.navbar-container {
+  position: relative; /* This allows absolute positioning of children */
+  width: 100%;
+  max-width: 1280px; /* or whatever max-width you prefer */
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.logo-container {
+  position: relative;
+  z-index: 41;
+}
+
+/* Accessibility Menu Positioning */
+.accessibility-menu {
+  position: absolute; /* Changed from fixed to absolute */
+  top: 50%;
+  right: 1.5rem;
+  transform: translateY(-50%);
+  z-index: 60;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 768px) {
+  .accessibility-menu {
+    right: 4rem; /* Space for mobile menu button */
+  }
+  
+  .navbar-container {
+    padding: 0 0.5rem;
+  }
+}
+
+/* Main content positioning */
+.main-content {
+  position: relative;
+  z-index: 10;
+}
+
+/* High Contrast Mode for Accessibility Menu */
+.high-contrast .accessibility-menu {
+  background-color: black !important;
+  border: 2px solid yellow !important;
+}
+
+/* Reading Mode for Accessibility Menu */
+.reading-mode .accessibility-menu {
+  background-color: #f4f4e0 !important;
+  font-family: "Georgia", serif !important;
+}
+.image-upload-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600; /* You can adjust this weight as needed */
+  font-style: normal;
+}
+
+.image-upload-para {
+  font-family: 'Alegreya', serif;
+  font-weight: 400;
+  font-style: normal;
+}

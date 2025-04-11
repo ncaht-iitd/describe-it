@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "total": 8,
+    "successful": 8,
+    "failed": 0
+  },
+  "results": [
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_1.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_2.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_3.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_4.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_5.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_6.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_7.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_geography_ch5_humanResources_diagram_8.png",
+      "status": "success"
+    }
+  ]
+}

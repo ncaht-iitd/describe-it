@@ -1,0 +1,25 @@
+{
+  "summary": {
+    "total": 4,
+    "successful": 4,
+    "failed": 0
+  },
+  "results": [
+    {
+      "imageName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_1.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_2.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_3.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class6_sst_ch12_localGovtInUrbanAreas_diagram_4.png",
+      "status": "success"
+    }
+  ]
+}

@@ -19,6 +19,8 @@ const axios = require("axios");
 
 const { getOpenAIResponse } = require('./services/openai');
 const addQuery = require('./services/addQuery');
+const imageRoutes = require('./routes/imageRoutes');
+const userUploadsRoutes = require('./routes/userUploads'); // Path to your file containing the code above
 
 require("dotenv").config();
 const LibraryRecord = require('./models/LibraryRecord'); 
@@ -30,29 +32,18 @@ const app = express();
 connectDB();
 
 // Middleware
-// app.use(cors({
-// origin: '*',
-// methods: ['GET', 'POST', 'OPTIONS'],
-// allowedHeaders: ['Content-Type']
-// }));
-
-app.use(cors({
+app.use(cors({  
   origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com', '*'],
   methods: ['GET', 'POST', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-app.options('*', cors()); // Enable pre-flight for all routes
+// Enable pre-flight for all routes
+app.options('*', cors());
 
 // Add request logging middleware
 app.use((req, res, next) => {
-  console.log('Request received:', {
-    method: req.method,
-    path: req.path,
-    origin: req.headers.origin,
-    contentType: req.headers['content-type']
-  });
   next();
 }); 
 
@@ -72,71 +63,25 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Modified route handler for askMore
-const handleAskMore = async (req, res) => {
-  try {
-    const { fig_no, user_query, language = 'en-US' } = req.body;
-    // Input validation
-    if (!fig_no || !user_query) {
-      return res.status(400).json({
-        error: "Missing required fields"
-      });
-    }
+// Wait for MongoDB connection before mounting routes
+mongoose.connection.once('open', () => {
+  console.log('MongoDB database connection established successfully');
+  
+  // Mount routes under /api prefix
+  app.use('/api', imageRoutes);
+  app.use('/api', userUploadsRoutes);
+});
 
-    // Find the document and its existing queries
-    const record = await LibraryRecord.findOne({ fig_no });
-    if (!record) {
-      return res.status(404).json({
-        error: "Figure not found"
-      });
-    }
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
 
-    // Check for similar queries
-    const similarityThreshold = 0.5;
-    const similarQueries = record.queries
-      .map(q => ({
-        ...q.toObject(),
-        similarity: calculateSimilarity(q.query, user_query)
-      }))
-      .filter(q => q.similarity > similarityThreshold)
-      .sort((a, b) => b.similarity - a.similarity);
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
-    if (similarQueries.length > 0) {
-      return res.status(200).json({
-        response: similarQueries[0].response,
-        success: true,
-        cached: true,
-        similarityScore: similarQueries[0].similarity,
-        originalQuery: similarQueries[0].query
-      });
-    }
-
-    // If no similar queries, proceed with OpenAI
-    const aiResponse = await getOpenAIResponse(record, user_query, language);
-
-    await addQuery(fig_no, user_query, aiResponse, extractKeywords(user_query), language);
-    
-    return res.status(200).json({
-      response: aiResponse,
-      success: true,
-      cached: false,
-      language
-    });
-
-  } catch (error) {
-    console.error("Error processing Ask More request:", error);
-    return res.status(500).json({
-      error: "Error processing your request",
-      success: false
-    });
-  }
-};
-
-module.exports = {
-  LibraryRecord,
-  addQuery,
-  handleAskMore
-};
+module.exports = app;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -146,7 +91,7 @@ const requiredEnvVars = [
   "AWS_S3_REGION",
   "AWS_ACCESS_KEY",
   "AWS_SECRET_KEY",
-  "AWS_BUCKET",
+  "AWS_S3_BUCKET_VT"
 ];
 requiredEnvVars.forEach((varName) => {
   if (!process.env[varName]) {
@@ -158,7 +103,7 @@ requiredEnvVars.forEach((varName) => {
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.AWS_BUCKET,
+    bucket: process.env.AWS_S3_BUCKET_VT,
     acl: "public-read",
     contentType: multerS3.AUTO_CONTENT_TYPE,
     key: function (req, file, cb) {
@@ -306,57 +251,6 @@ app.get('/ping', (req, res) => {
   return res.json({ success: true, response: 'pong' });
 });
 
-// GET THE OVERALL DATA LIST FOR CLASS CHAPTER SUBJECT AND FIG No.
-app.get("/allData", async (req, res) => {
-  try {
-    console.log('Fetching all documents from LibraryRecord...');
-    const documents = await LibraryRecord.find({});
-    
-    console.log(`Found ${documents.length} documents`);
-    if (documents.length === 0) {
-      console.log('No documents found in the database');
-      return res.status(200).json({ data: {} });
-    }
-
-    const data = {};
-
-    documents.forEach((doc) => {
-      try {
-        const standard = parseInt(doc.standard.replace("Class ", ""));
-        const subject = doc.subject;
-        const chapter = doc.chapter;
-        const figure = doc.fig_no;
-
-        // Initialize nested objects if they don't exist
-        if (!data[standard]) {
-          data[standard] = {};
-        }
-
-        if (!data[standard][subject]) {
-          data[standard][subject] = {};
-        }
-
-        if (!data[standard][subject][chapter]) {
-          data[standard][subject][chapter] = [];
-        }
-
-        data[standard][subject][chapter].push(figure);
-      } catch (docError) {
-        console.error('Error processing document:', docError, doc);
-      }
-    });
-
-    console.log('Final data structure keys:', Object.keys(data));
-    return res.status(200).json({ data });
-  } catch (err) {
-    console.error('Error in /allData:', err);
-    return res.status(500).json({ 
-      error: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-  }
-});
-
 // GET FIGURE DATA
 app.post("/figData", async (req, res) => {
   const { grade, subject, chapter, figNo } = req.body;
@@ -459,25 +353,6 @@ app.get("/test/database", async (req, res) => {
   }
 });
 
-//ADD USER REVIEW
-app.post("/review", async (req, res) => {
-  const { review, grade, subject, chapter, figNo } = req.body;
-  try {
-    const record = await LibraryRecord.findOne({
-      subject: subject,
-      standard: `Class ${grade}`,
-      chapter: chapter,
-      fig_no: figNo,
-      book: "NCERT",
-    });
-    record.reviews.push(review);
-    await record.save();
-    return res.status(200).json({ message: "Review added successfully" });
-  } catch (err) {
-    return res.status(500).json({ error: err.message });
-  }
-});
-
 // Helper function to extract keywords with fixed stopWords implementation
 function extractKeywords(query) {
   // Define stopWords as an array instead of a Set
@@ -539,170 +414,6 @@ function calculateSimilarity(query1, query2) {
   return combinedSimilarity;
 }
 
-// app.post("/askMore", async (req, res) => {
-//   let record;
-//   const { fig_no, user_query, language } = req.body;
-
-//   try {
-//     console.log("Starting to process request");
-
-//     // Input validation
-//     if (!fig_no || !user_query) {
-//       return res.status(400).json({
-//         error: "Missing required fields",
-//         response: "Missing required information. Please provide both figure number and question.",
-//         details: {
-//           fig_no: !fig_no ? "Figure number is required" : null,
-//           user_query: !user_query ? "User query is required" : null
-//         }
-//       });
-//     }
-
-//     // Find the document and get existing queries
-//     record = await LibraryRecord.findOne({ fig_no });
-//     if (!record) {
-//       return res.status(404).json({
-//         error: "Figure not found",
-//         response: "Sorry, I couldn't find information about that figure. Please check the figure number and try again.",
-//         details: `No record found for figure number: ${fig_no}`
-//       });
-//     }
-
-//     // Get existing queries from the document
-//     const existingQueries = record.queries || [];
-    
-//     // Check for similar queries
-//     const similarityThreshold = 0.5;
-//     const similarQueries = existingQueries
-//       .map(query => ({
-//         ...query.toObject(),
-//         similarity: calculateSimilarity(query.query, user_query)
-//       }))
-//       .filter(query => query.similarity > similarityThreshold)
-//       .sort((a, b) => b.similarity - a.similarity);
-
-//     if (similarQueries.length > 0) {
-//       console.log('Similar query found:', {
-//         original: similarQueries[0].query,
-//         new: user_query,
-//         similarity: similarQueries[0].similarity
-//       });
-
-//     console.log("Similar queries found:", similarQueries.length);
-//     console.log("About to call OpenAI API");
-      
-//       return res.status(200).json({
-//         response: similarQueries[0].response,
-//         success: true,
-//         cached: true,
-//         similarityScore: similarQueries[0].similarity,
-//         originalQuery: similarQueries[0].query
-//       });
-//     }
-
-//     const { description, subject, chapter, standard } = record;
-
-//     // Create OpenAI prompt
-//     const prompt = `Context: ${subject}, ${standard}, Chapter: ${chapter}, Figure ${fig_no}
-    
-//     Original description: "${description}"
-    
-//     Question: "${user_query}"
-    
-//     Preferred language: ${language || 'en-US'}
-    
-//     Provide a brief, direct answer that is:
-//     1. Screen-reader friendly (no special formatting or symbols)
-//     2. Under 3 sentences where possible
-//     3. Uses plain language suitable for grade ${standard}
-//     4. Focuses only on the specific question asked
-//     5. Avoids unnecessary repetition of context
-    
-//     Answer the question directly without any introductory phrases or conclusions.`;
-
-//     // Get response from OpenAI
-//     const response = await openai.chat.completions.create({
-//       model: "gpt-4o",
-//       messages: [
-//         {
-//           role: "system",
-//           content: "You are a concise mathematics teacher. Provide brief, clear answers without formatting, markdown, or special characters. Focus on essential information only."
-//         },
-//         {
-//           role: "user",
-//           content: prompt
-//         }
-//       ],
-//       temperature: 0.3,
-//       max_tokens: 200
-//     });
-
-//     const aiResponse = response.choices[0].message.content;
-//     console.log("OpenAI API response received");
-//     // Add new query to the document
-//     await LibraryRecord.findOneAndUpdate(
-//       { fig_no },
-//       {
-//         $push: {
-//           queries: {
-//             query: user_query,
-//             response: aiResponse,
-//             keywords: extractKeywords(user_query),
-//             timestamp: new Date()
-//           }
-//         }
-//       },
-//       { new: true }
-//     );
-
-//     console.log('New query logged:', {
-//       fig_no,
-//       query: user_query,
-//       keywords: extractKeywords(user_query)
-//     });
-
-//     return res.status(200).json({
-//       response: aiResponse,
-//       success: true,
-//       cached: false
-//     });
-
-//   } catch (error) {
-//     console.error("Error processing Ask More request:", error);
-//     const errorResponse = {
-//       error: "Error processing your request",
-//       response: "Sorry, I encountered a technical issue. Please try again later.",
-//       success: false,
-//       details: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
-//     };
-
-//     // Make sure to use req.body.fig_no instead of fig_no directly if there's a chance
-//     // it might not be accessible due to previous errors
-//     if (error.message && error.message.includes("No record found")) {
-//       errorResponse.error = "Figure not found";
-//       errorResponse.response = "Sorry, I couldn't find that figure in our database.";
-//       errorResponse.details = `No record found for figure number: ${req.body.fig_no || 'unknown'}`;
-//       return res.status(404).json(errorResponse);
-//     }
-
-//     if (error.response?.status === 429) {
-//       errorResponse.error = "Rate limit exceeded. Please try again later.";
-//       errorResponse.response = "I'm getting too many requests right now. Please try again in a moment.";
-//       return res.status(429).json(errorResponse);
-//     }
-
-//     if (error.response?.status === 400) {
-//       errorResponse.error = "Invalid request to AI service";
-//       errorResponse.response = "I couldn't process your question. Please try rephrasing it.";
-//       return res.status(400).json(errorResponse);
-//     }
-
-//     return res.status(500).json(errorResponse);
-//   }
-// });
-
-app.post("/askMore", handleAskMore);
-
 app.get("/test/logs", async (req, res) => {
   try {
     const logs = await QueryLog.find({});
@@ -713,18 +424,3 @@ app.get("/test/logs", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch logs" });
   }
 });
-
-// Add this after all your routes are registered
-console.log('Registered routes:');
-app._router.stack.forEach(r => {
-  if (r.route && r.route.path) {
-    console.log(`${Object.keys(r.route.methods)} ${r.route.path}`);
-  }
-});
-
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
-
-module.exports = app;

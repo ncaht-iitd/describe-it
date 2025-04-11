@@ -1,0 +1,33 @@
+{
+  "summary": {
+    "total": 6,
+    "successful": 6,
+    "failed": 0
+  },
+  "results": [
+    {
+      "imageName": "class7_Science_ch13_wastewater_diagram_1.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_Science_ch13_wastewater_diagram_2.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_Science_ch13_wastewater_diagram_3.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_Science_ch13_wastewater_diagram_4.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_Science_ch13_wastewater_diagram_5.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class7_Science_ch13_wastewater_diagram_6.png",
+      "status": "success"
+    }
+  ]
+}

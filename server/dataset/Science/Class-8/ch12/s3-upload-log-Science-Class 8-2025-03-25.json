@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "total": 7,
+    "successful": 7,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_1.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_1.png"
+    },
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_2.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_2.png"
+    },
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_3.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_3.png"
+    },
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_4.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_4.png"
+    },
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_5.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_5.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_5.png"
+    },
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_6.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_6.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_6.png"
+    },
+    {
+      "fileName": "class8_Science_ch12_foodResources_diagram_7.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Science/Class 8/class8_Science_ch12_foodResources_diagram_7.png",
+      "key": "Science/Class 8/class8_Science_ch12_foodResources_diagram_7.png"
+    }
+  ]
+}

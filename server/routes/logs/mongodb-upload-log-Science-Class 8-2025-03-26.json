@@ -1,0 +1,49 @@
+{
+  "summary": {
+    "total": 10,
+    "successful": 10,
+    "failed": 0
+  },
+  "results": [
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_1.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_10.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_2.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_3.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_4.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_5.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_6.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_7.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_8.png",
+      "status": "success"
+    },
+    {
+      "imageName": "class8_Science_ch1_matterInOurSurroundings_diagram_9.png",
+      "status": "success"
+    }
+  ]
+}

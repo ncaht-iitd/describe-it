@@ -1,0 +1,51 @@
+{
+  "summary": {
+    "total": 7,
+    "successful": 7,
+    "failed": 0
+  },
+  "results": [
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_1.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_1.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_1.png"
+    },
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_2.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_2.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_2.png"
+    },
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_3.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_3.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_3.png"
+    },
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_4.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_4.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_4.png"
+    },
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_5.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_5.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_5.png"
+    },
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_6.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_6.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_6.png"
+    },
+    {
+      "fileName": "class8_maths_ch13_introductionToGraphs_diagram_7.png",
+      "success": true,
+      "imageUrl": "https://vision-text-library.s3.ap-south-1.amazonaws.com/Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_7.png",
+      "key": "Mathematics/Class-8/class8_maths_ch13_introductionToGraphs_diagram_7.png"
+    }
+  ]
+}

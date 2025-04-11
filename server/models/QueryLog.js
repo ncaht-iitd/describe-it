@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const QueryLogSchema = new mongoose.Schema({
+  libraryRecordId: { type: mongoose.Schema.Types.ObjectId, ref: 'LibraryRecord' }, 
   fig_no: { type: String, required: true },
   query: { type: String, required: true },
   response: { type: String, required: true },
