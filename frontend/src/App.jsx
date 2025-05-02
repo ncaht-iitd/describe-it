@@ -9,6 +9,7 @@ import ImageNotFound from "./pages/ImageNotFound";
 import Login from "./forms/Login";
 import Signup from "./forms/Signup";
 import Dashboard from "./pages/Dashboard";
+import FileExtractor from './components/FileExtractor';
 import './styles/accessibility.css';
 import { testAppwriteConnection, verifyStorageBucket, verifyDatabaseAccess, isLoggedIn } from './services/appwriteService';
 
@@ -189,6 +190,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/file-extractor" element={<FileExtractor />} />
         </Routes>
       </Content>
     </Layout>

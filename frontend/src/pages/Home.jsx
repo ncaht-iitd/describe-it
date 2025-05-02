@@ -164,7 +164,36 @@ function Home() {
         </div>
       </motion.div>
 
-      {/* Features Section */}
+      {/* Document Tools Section */}
+      <div className="bg-gradient-to-b from-gray-900 to-gray-800 py-16">
+        <div className="container mx-auto px-8">
+          <motion.div 
+            className="flex flex-col items-center"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+          >
+            <h2 className="text-4xl font-poppins-bold mb-6 text-yellow-400">Document Tools</h2>
+            <p className="text-gray-300 font-poppins-thin text-lg mb-8 text-center max-w-2xl">
+              Extract images from your documents with our powerful tool. Perfect for processing textbooks and educational materials.
+            </p>
+            <motion.button
+              onClick={() => navigate('/file-extractor')}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 transform hover:scale-105 font-poppins-normal flex items-center space-x-2 shadow-lg"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <span>Image Extraction Tool</span>
+            </motion.button>
+          </motion.div>
+        </div>
+      </div>
+
+    {/* Features Section */}
       <div className="bg-gradient-to-b from-gray-900 to-gray-800 py-32">
         <div className="container mx-auto px-8">
           <motion.h2 
