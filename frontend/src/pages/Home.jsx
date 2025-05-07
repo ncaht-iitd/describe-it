@@ -175,20 +175,61 @@ function Home() {
             transition={{ duration: 0.8 }}
           >
             <h2 className="text-4xl font-poppins-bold mb-6 text-yellow-400">Document Tools</h2>
-            <p className="text-gray-300 font-poppins-thin text-lg mb-8 text-center max-w-2xl">
-              Extract images from your documents with our powerful tool. Perfect for processing textbooks and educational materials.
+            <p className="text-gray-300 font-poppins-thin text-lg mb-12 text-center max-w-2xl">
+              Powerful tools to process your educational materials and generate accessible content
             </p>
-            <motion.button
-              onClick={() => navigate('/file-extractor')}
-              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 transform hover:scale-105 font-poppins-normal flex items-center space-x-2 shadow-lg"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-              <span>Image Extraction Tool</span>
-            </motion.button>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl">
+              {/* Image Extraction Tool Card */}
+              <motion.div
+                className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-8 border border-gray-700 shadow-xl"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex flex-col h-full">
+                  <h3 className="text-2xl font-poppins-bold mb-4 text-yellow-400">Image Extraction</h3>
+                  <p className="text-gray-300 font-poppins-thin mb-6">
+                    Extract images from your documents with our powerful tool. Perfect for processing textbooks and educational materials.
+                  </p>
+                  <motion.button
+                    onClick={() => navigate('/file-extractor')}
+                    className="mt-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 font-poppins-normal flex items-center justify-center space-x-2 shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    <span>Extract Images</span>
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              {/* Image Description Tool Card */}
+              <motion.div
+                className="bg-gray-800/70 backdrop-blur-sm rounded-xl p-8 border border-gray-700 shadow-xl"
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div className="flex flex-col h-full">
+                  <h3 className="text-2xl font-poppins-bold mb-4 text-yellow-400">Description Generator</h3>
+                  <p className="text-gray-300 font-poppins-thin mb-6">
+                    Generate detailed, accessible descriptions for your images using AI. Ideal for creating inclusive educational content.
+                  </p>
+                  <motion.button
+                    onClick={() => navigate('/image-description-generator')}
+                    className="mt-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all duration-300 font-poppins-normal flex items-center justify-center space-x-2 shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 14h16M4 10h16M4 18h7" />
+                    </svg>
+                    <span>Generate Descriptions</span>
+                  </motion.button>
+                </div>
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Layout, Alert, Spin } from 'antd';
+
 import HomePage from "./pages/Home";
 import DescriptionPage from "./pages/DescriptionPage";
 import SearchResults from "./pages/SearchResults";
@@ -10,8 +11,12 @@ import Login from "./forms/Login";
 import Signup from "./forms/Signup";
 import Dashboard from "./pages/Dashboard";
 import FileExtractor from './components/FileExtractor';
+import ImageDescriptionTool from './components/ImageDescriptionGenerator';
+
 import './styles/accessibility.css';
+
 import { testAppwriteConnection, verifyStorageBucket, verifyDatabaseAccess, isLoggedIn } from './services/appwriteService';
+
 
 const { Content } = Layout;
 
@@ -191,6 +196,7 @@ function App() {
             }
           />
           <Route path="/file-extractor" element={<FileExtractor />} />
+          <Route path="/image-description-generator" element={<ImageDescriptionTool />} />
         </Routes>
       </Content>
     </Layout>

@@ -13,7 +13,7 @@ const LibraryRecordSchema = new mongoose.Schema({
   description: { type: String, required: true },
   fig_no: { type: String, required: false },
   reviews: { type: Array, default: [] },
-  keywords: { type: [String], default: [] } // Ensure default is an empty array
+  keywords: { type: [String], default: [] } 
 });
 
 
