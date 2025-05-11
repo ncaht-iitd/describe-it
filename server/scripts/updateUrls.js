@@ -1,7 +1,7 @@
 const { MongoClient } = require('mongodb');
 
 // MongoDB connection details
-const uri = "mongodb+srv://ncahtiitd:ilmWRsUUX9SVZBTw@cluster1.ihm2k.mongodb.net/image_descriptions?retryWrites=true&w=majority&appName=Cluster1"; // Replace with your MongoDB connection string
+const uri = process.env.MONGO_URI;
 const dbName = "image_descriptions"; // Replace with your database name
 const collectionName = "libraryrecords"; // Replace with your collection name
 

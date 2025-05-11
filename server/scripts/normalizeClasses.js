@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const LibraryRecord = require('../models/LibraryRecord');  // Adjust the path if needed
-
+const mongoURI = process.env.MONGO_URI;
 // MongoDB connection
-mongoose.connect('mongodb+srv://ncahtiitd:ilmWRsUUX9SVZBTw@cluster1.ihm2k.mongodb.net/image_descriptions?retryWrites=true&w=majority&appName=Cluster1', {
+mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }).then(() => {

@@ -1,23 +1,10 @@
 // src/services/appwriteService.js
 import { Client, Account, Databases, Storage, ID, Query, Permission, Role } from 'appwrite';
 
-// Log environment variables for debugging
-console.log('Appwrite Endpoint:', import.meta.env.VITE_APPWRITE_ENDPOINT);
-console.log('Appwrite Project ID:', import.meta.env.VITE_APPWRITE_PROJECT_ID);
-console.log('Appwrite Database ID:', import.meta.env.VITE_APPWRITE_DATABASE_ID);
-console.log('Appwrite Collection ID:', import.meta.env.VITE_APPWRITE_COLLECTION_ID);
-console.log('Appwrite Bucket ID:', import.meta.env.VITE_APPWRITE_BUCKET_ID);
-
 // Initialize Appwrite
 const client = new Client()
   .setEndpoint(import.meta.env.VITE_APPWRITE_ENDPOINT)
   .setProject(import.meta.env.VITE_APPWRITE_PROJECT_ID);
-
-// Log client configuration
-console.log('Appwrite Client Configuration:', {
-  endpoint: client.config.endpoint,
-  project: client.config.project
-});
 
 const account = new Account(client);
 const databases = new Databases(client);
@@ -164,7 +151,7 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
     if (!user) {
       // Store temporary data in localStorage
       const tempRequest = {
-        imageDataUrl: URL.createObjectURL(imageFile), // Use URL.createObjectURL for temporary preview
+        imageDataUrl: URL.createObjectURL(imageFile),
         description,
         additionalInfo,
         timestamp: new Date().toISOString()
@@ -172,9 +159,6 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
       localStorage.setItem('pendingTactileRequest', JSON.stringify(tempRequest));
       throw new Error('User must be logged in to submit a request');
     }
-
-    console.log('Uploading image to bucket:', TACTILE_IMAGES_BUCKET_ID);
-    console.log('Current user:', user.$id);
     
     // 2. Upload the image to storage
     let fileUpload;
@@ -186,15 +170,14 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
           ID.unique(),
           imageFile,
           [
-            Permission.read(Role.any()), // Anyone can read
-            Permission.update(Role.user(user.$id)), // Only the user can update
-            Permission.delete(Role.user(user.$id)) // Only the user can delete
+            Permission.read(Role.any()),
+            Permission.update(Role.user(user.$id)),
+            Permission.delete(Role.user(user.$id))
           ]
         );
       } catch (permError) {
         // If permissions parameter is not supported, try without it
         if (permError.message && permError.message.includes('parameter')) {
-          console.log('Trying file upload without permissions parameter');
           fileUpload = await storage.createFile(
             TACTILE_IMAGES_BUCKET_ID,
             ID.unique(),
@@ -204,8 +187,6 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
           throw permError;
         }
       }
-      
-      console.log('File uploaded successfully:', fileUpload);
     } catch (error) {
       console.error('File upload error:', error);
       if (error.code === 401) {
@@ -225,10 +206,8 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
       additionalInfo: additionalInfo || '',
       status: 'Requested',
       requestDate: new Date().toISOString(),
-      estimatedCompletionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // Setting default to 7 days from now
+      estimatedCompletionDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
     };
-    
-    console.log('Creating document with data:', requestData);
     
     try {
       let request;
@@ -240,15 +219,14 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
           ID.unique(),
           requestData,
           [
-            Permission.read(Role.user(user.$id)), // Only the user can read their own requests
-            Permission.update(Role.user(user.$id)), // Only the user can update
-            Permission.delete(Role.user(user.$id)) // Only the user can delete
+            Permission.read(Role.user(user.$id)),
+            Permission.update(Role.user(user.$id)),
+            Permission.delete(Role.user(user.$id))
           ]
         );
       } catch (permError) {
         // If permissions parameter is not supported, try without it
         if (permError.message && permError.message.includes('parameter')) {
-          console.log('Trying document creation without permissions parameter');
           request = await databases.createDocument(
             TACTILE_REQUESTS_DATABASE_ID,
             TACTILE_REQUESTS_COLLECTION_ID,
@@ -259,8 +237,6 @@ export const submitTactileRequest = async (imageFile, description, additionalInf
           throw permError;
         }
       }
-  
-      console.log('Document created successfully:', request);
   
       // Clear any pending request
       localStorage.removeItem('pendingTactileRequest');
@@ -548,24 +524,13 @@ export const isAdmin = async () => {
 // Update the testAppwriteConnection function to include database and storage verification
 export const testAppwriteConnection = async () => {
   try {
-    // First verify client configuration
-    console.log('Appwrite Client Configuration:', {
-      endpoint: client.config.endpoint,
-      project: client.config.project,
-      database: TACTILE_REQUESTS_DATABASE_ID,
-      collection: TACTILE_REQUESTS_COLLECTION_ID,
-      bucket: TACTILE_IMAGES_BUCKET_ID
-    });
-
     // Try to get current session
     let isAuthenticated = false;
     try {
       const user = await account.get();
-      console.log('User authenticated:', user);
       isAuthenticated = true;
     } catch (error) {
       if (error.code === 401) {
-        console.log('Not logged in - this is expected for guests');
         isAuthenticated = false; // Connection is working, just not authenticated
       } else {
         throw error;
@@ -576,14 +541,12 @@ export const testAppwriteConnection = async () => {
     if (isAuthenticated) {
       try {
         await verifyStorageBucket();
-        console.log('Storage bucket verified');
       } catch (error) {
         console.error('Storage bucket verification failed:', error);
       }
 
       try {
         await verifyDatabaseAccess();
-        console.log('Database access verified');
       } catch (error) {
         console.error('Database access verification failed:', error);
       }

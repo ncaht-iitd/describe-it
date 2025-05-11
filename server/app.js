@@ -14,16 +14,13 @@ const { v4: uuidv4 } = require("uuid");
 
 const OpenAI = require("openai");
 const sharp = require("sharp");
-
 const axios = require("axios");
 
 const { getOpenAIResponse } = require('./services/openai');
 const addQuery = require('./services/addQuery');
-const imageRoutes = require('./routes/imageRoutes');
-const userUploadsRoutes = require('./routes/userUploads'); // Path to your file containing the code above
+const LibraryRecord = require('./models/LibraryRecord'); 
 
 require("dotenv").config();
-const LibraryRecord = require('./models/LibraryRecord'); 
 
 // Initialize Express app
 const app = express();
@@ -31,54 +28,147 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware
-app.use(cors({  
-  origin: ['http://localhost:5173', 'https://vision-text-v1-1-1.onrender.com', '*'],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+// Basic Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Log all incoming requests to help debug
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
+
+// CORS setup with detailed options
+app.use(cors({
+  origin: '*',  // Allow all origins during testing
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'Origin', 'X-Requested-With'],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 // Enable pre-flight for all routes
 app.options('*', cors());
 
-// Add request logging middleware
+// Request logging middleware with more details
 app.use((req, res, next) => {
+  console.log('=== Incoming Request ===');
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Method: ${req.method}`);
+  console.log(`Path: ${req.path}`);
+  console.log('Origin:', req.headers.origin);
+  console.log('Headers:', JSON.stringify(req.headers, null, 2));
+  if (req.method !== 'GET') {
+    console.log('Body:', JSON.stringify(req.body, null, 2));
+  }
+  console.log('======================');
   next();
-}); 
-
-app.get('/cors-test', cors(), (req, res) => {
-  res.json({ message: 'CORS is working!' });
 });
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-// Rate limiter
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 300,
-  standardHeaders: "draft-7",
-  legacyHeaders: false,
-});
-app.use(limiter);
-
-// Wait for MongoDB connection before mounting routes
+// Start server only after MongoDB connects
 mongoose.connection.once('open', () => {
   console.log('MongoDB database connection established successfully');
   
-  // Mount routes under /api prefix
-  app.use('/api', imageRoutes);
-  app.use('/api', userUploadsRoutes);
+  // PDF Download route
+  app.post('/api/pdf/download', async (req, res) => {
+    console.log('PDF Download endpoint hit!');
+
+    try {
+      console.log('=== PDF Download Request ===');
+      console.log('Request body:', req.body);
+      
+      const { image_name } = req.body;
+
+      // Validate image_name is present
+      if (!image_name) {
+        console.log('Missing image_name');
+        return res.status(400).json({
+          error: "Missing required field",
+          details: "image_name is required"
+        });
+      }
+
+      // Query ONLY by image_name
+      const query = { image_name };
+      console.log('Database query:', query);
+
+      // Find the document
+      const document = await LibraryRecord.findOne(query);
+
+      if (!document) {
+        console.log('No document found for query');
+        return res.status(404).json({
+          error: "Document not found",
+          details: "No document found with the provided image name",
+          searchCriteria: query
+        });
+      }
+
+      console.log('Found document:', {
+        id: document._id,
+        standard: document.standard,
+        subject: document.subject,
+        image_name: document.image_name,
+        hasPdfUrl: !!document.pdf_url
+      });
+
+      // Check if pdf_url exists
+      if (!document.pdf_url) {
+        return res.status(404).json({
+          error: "PDF not available",
+          details: "PDF file is not available for this image",
+          documentInfo: {
+            id: document._id,
+            standard: document.standard,
+            subject: document.subject,
+            image_name: document.image_name
+          }
+        });
+      }
+
+      // Return the PDF URL with success response
+      const response = {
+        success: true,
+        pdf_url: document.pdf_url,
+        documentInfo: {
+          id: document._id,
+          standard: document.standard,
+          subject: document.subject,
+          image_name: document.image_name
+        }
+      };
+
+      console.log('Sending response:', response);
+      return res.status(200).json(response);
+
+    } catch (error) {
+      console.error("Error in PDF download route:", error);
+      return res.status(500).json({
+        error: "Server error",
+        details: error.message
+      });
+    }
+  });
+
+  const port = process.env.PORT || 5000;
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+    console.log('Available routes:');
+    console.log('- GET  /api/test');
+    console.log('- POST /api/pdf/download');
+    console.log('- POST /api/search');
+    console.log('- POST /api/chapterImages');
+    console.log('- POST /api/figData');
+    console.log('- GET  /api/image/:id');
+    console.log('- GET  /api/allData');
+    console.log('- POST /api/review');
+    console.log('- POST /api/askMore');
+  });
 });
 
 mongoose.connection.on('error', (err) => {
   console.error('MongoDB connection error:', err);
-});
-
-const port = process.env.PORT || 5000;
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
 });
 
 module.exports = app;
@@ -422,5 +512,24 @@ app.get("/test/logs", async (req, res) => {
   } catch (error) {
     console.error('Error fetching logs:', error);
     res.status(500).json({ error: "Failed to fetch logs" });
+  }
+});
+
+// Add a test endpoint to list documents
+app.get("/api/list-docs", async (req, res) => {
+  try {
+    const docs = await LibraryRecord.find({})
+      .select('standard subject image_name pdf_url')
+      .limit(5);
+    
+    return res.status(200).json({
+      count: docs.length,
+      documents: docs
+    });
+  } catch (err) {
+    console.error('Error listing documents:', err);
+    return res.status(500).json({
+      error: err.message
+    });
   }
 });

@@ -10,7 +10,7 @@ import logo from "../assets/images/NCAHT-Logo.png";
 
 import "../index.css";
 import HTMLparser from "../components/HTMLparser";
-import { getData, getImageDescription, updateUserReview } from "../api/config";
+import { getData, getImageDescription, updateUserReview, getPdfDownloadUrl } from "../api/config";
 
 const DescriptionPage = () => {
   const [searchParams] = useSearchParams();
@@ -34,6 +34,9 @@ const DescriptionPage = () => {
   const [userReview, setUserReview] = useState("");
   const [showUserReview, setShowUserReview] = useState(false);
   const [reviewStatus, setReviewStatus] = useState({ type: '', message: '' });
+
+  // Add new state for download status
+  const [downloadStatus, setDownloadStatus] = useState({ loading: false, error: null });
 
   // Extract data from imageDataFromSearch or URL params as fallback
   const standardMatch = imageDataFromSearch?.standard?.match(/Class[- ](\d+)/i);
@@ -175,6 +178,109 @@ const DescriptionPage = () => {
     }
   };
 
+  // Add download handler function
+
+  const handleDownload = async () => {
+    try {
+      setDownloadStatus({ loading: true, error: null });
+      
+      // Format the grade number from standard/grade string
+      const gradeMatch = grade?.match(/\d+/);
+      const gradeNumber = gradeMatch ? gradeMatch[0] : grade;
+      
+      // Validate image_name is present
+      if (!image_name) {
+        throw new Error('Image name is required for downloading PDF');
+      }
+      
+      // Log request data for debugging
+      console.log('Download request data:', {
+        grade: gradeNumber,
+        subject,
+        chapter,
+        image_name,
+        imageDataFromSearch
+      });
+      
+      // IMPORTANT: Check if we're passing in the correct parameters before making the request
+      if (!gradeNumber) {
+        console.warn('Warning: Grade number is missing or invalid');
+      }
+      if (!subject) {
+        console.warn('Warning: Subject is missing');
+      }
+      if (!image_name) {
+        console.error('Error: image_name is required');
+        throw new Error('Image name is required');
+      }
+      
+      // Try to download with available information
+      console.log('Sending PDF download request with data:', {
+        gradeNumber,
+        subject,
+        chapter: typeof chapter === 'object' ? chapter.name : chapter,
+        image_name
+      });
+      
+      const response = await getPdfDownloadUrl(
+        gradeNumber,
+        subject,
+        chapter,
+        undefined, // figNo is not needed
+        image_name
+      );
+  
+      if (!response || !response.pdf_url) {
+        throw new Error('PDF URL not found for this image');
+      }
+  
+      // Log successful response
+      console.log('Download successful, opening PDF:', response.pdf_url);
+  
+      // Create a temporary link element to trigger the download
+      const link = document.createElement('a');
+      link.href = response.pdf_url;
+      link.target = '_blank';
+      link.download = `${title || 'figure'}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
+      setDownloadStatus({ loading: false, error: null });
+    } catch (error) {
+      console.error('Download failed:', error);
+      
+      // More detailed error handling
+      let errorMessage = 'Failed to download PDF. Please try again later.';
+      
+      if (error.response) {
+        if (error.response.status === 404) {
+          errorMessage = 'PDF download service is not available. Please contact support.';
+        } else {
+          errorMessage = error.response.data?.error || error.response.data || error.message;
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      console.error('Error details:', {
+        message: errorMessage,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      
+      setDownloadStatus({ 
+        loading: false, 
+        error: errorMessage
+      });
+  
+      // Clear error after 5 seconds (increased from 3 for better visibility)
+      setTimeout(() => {
+        setDownloadStatus({ loading: false, error: null });
+      }, 5000);
+    }
+  };
+
   if (!imageDataFromSearch) {
     return (
       <div className="flex flex-col items-center justify-center h-screen">
@@ -264,12 +370,22 @@ const DescriptionPage = () => {
               </button>
 
               <button
-                className="p-2 rounded bg-red-500 text-white hover:bg-red-600 transition duration-300"
+                className={`p-2 rounded ${downloadStatus.loading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-red-500 hover:bg-red-600'} text-white transition duration-300`}
                 aria-label="Download Tactile version of the Figure"
+                onClick={handleDownload}
+                disabled={downloadStatus.loading}
               >
                 <Download className="w-6 h-6" />
               </button>
             </div>
+
+            {downloadStatus.error && (
+              <div className="mt-2 text-red-500 text-sm">
+                {downloadStatus.error}
+              </div>
+            )}
 
             {showReview && (
               <div className="p-4 mt-4 bg-white rounded-lg shadow-md w-full">

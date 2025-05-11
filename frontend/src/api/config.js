@@ -1,6 +1,15 @@
 import axios from "axios";
 
-export const baseURI = import.meta.env.VITE_BACKEND_URL;
+// Use the environment variable with a fallback
+export const baseURI = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
+// Check your baseURI value:
+console.log('Current baseURI:', baseURI);
+
+// Configure axios defaults
+axios.defaults.baseURL = baseURI;
+axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.timeout = 30000; // 30 seconds
 
 export const getData = async () => {
   try {
@@ -161,6 +170,51 @@ export const getUserImageDescription = async (formData) => {
     return response.data;
   } catch (error) {
     console.error("Error getting user image description:", error);
+    throw error;
+  }
+};
+
+// Function to get PDF download URL
+export const getPdfDownloadUrl = async (grade, subject, chapter, figNo, image_name) => {
+  try {
+    // Log the backend URL and request data
+    console.log('=== PDF Download Request ===');
+    
+    // Validate image_name is present
+    if (!image_name) {
+      throw new Error('image_name is required for PDF download');
+    }
+
+    // Send ONLY the image_name parameter
+    const requestData = {
+      image_name: image_name
+    };
+
+    console.log('Making PDF download request with:', requestData);
+
+    const response = await axios({
+      url: '/api/pdf/download',
+      method: "POST",
+      data: requestData,
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      }
+    });
+
+    if (!response.data || !response.data.success) {
+      throw new Error(response.data?.error || 'Failed to get PDF URL');
+    }
+
+    console.log('PDF download response:', response.data);
+    return response.data;
+
+  } catch (error) {
+    console.error('PDF download request failed:', {
+      message: error.message,
+      status: error.response?.status,
+      data: error.response?.data
+    });
     throw error;
   }
 };
