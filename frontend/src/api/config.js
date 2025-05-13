@@ -3,9 +3,6 @@ import axios from "axios";
 // Use the environment variable with a fallback
 export const baseURI = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
-// Check your baseURI value:
-console.log('Current baseURI:', baseURI);
-
 // Configure axios defaults
 axios.defaults.baseURL = baseURI;
 axios.defaults.headers.common['Accept'] = 'application/json';

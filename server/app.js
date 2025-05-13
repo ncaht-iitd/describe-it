@@ -18,6 +18,8 @@ const axios = require("axios");
 
 const { getOpenAIResponse } = require('./services/openai');
 const addQuery = require('./services/addQuery');
+const imageRoutes = require('./routes/imageRoutes');
+const userUploadsRoutes = require('./routes/userUploads'); 
 const LibraryRecord = require('./models/LibraryRecord'); 
 
 require("dotenv").config();
@@ -70,6 +72,9 @@ app.use((req, res, next) => {
 mongoose.connection.once('open', () => {
   console.log('MongoDB database connection established successfully');
   
+  app.use('/api', imageRoutes);
+  app.use('/api', userUploadsRoutes);
+
   // PDF Download route
   app.post('/api/pdf/download', async (req, res) => {
     console.log('PDF Download endpoint hit!');
@@ -154,16 +159,6 @@ mongoose.connection.once('open', () => {
   const port = process.env.PORT || 5000;
   app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
-    console.log('Available routes:');
-    console.log('- GET  /api/test');
-    console.log('- POST /api/pdf/download');
-    console.log('- POST /api/search');
-    console.log('- POST /api/chapterImages');
-    console.log('- POST /api/figData');
-    console.log('- GET  /api/image/:id');
-    console.log('- GET  /api/allData');
-    console.log('- POST /api/review');
-    console.log('- POST /api/askMore');
   });
 });
 

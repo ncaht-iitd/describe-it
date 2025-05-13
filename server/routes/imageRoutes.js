@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const LibraryRecord = require('../models/LibraryRecord'); // Adjust path as needed
+const LibraryRecord = require('../models/LibraryRecord'); 
 const { getOpenAIResponse } = require('../services/openai');
 
 // Keyword search endpoint
