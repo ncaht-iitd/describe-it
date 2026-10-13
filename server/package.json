@@ -4,7 +4,7 @@
 	"description": "",
 	"main": "app.js",
 	"scripts": {
-		"test": "echo \"Error: no test specified\" && exit 1",
+		"test": "node --test test/*.test.js",
 		"start": "node app.js"
 	},
 	"author": "",
@@ -32,5 +32,9 @@
 		"sharp": "^0.33.5",
 		"uuid": "^10.0.0",
 		"xlsx": "^0.18.5"
+	},
+	"devDependencies": {
+		"mongodb-memory-server": "^10.4.3",
+		"supertest": "^7.3.1"
 	}
 }
