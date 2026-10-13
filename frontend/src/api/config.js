@@ -6,7 +6,7 @@ export const baseURI = import.meta.env.VITE_BACKEND_URL || 'http://localhost:500
 // Configure axios defaults
 axios.defaults.baseURL = baseURI;
 axios.defaults.headers.common['Accept'] = 'application/json';
-axios.defaults.timeout = 30000; // 30 seconds
+axios.defaults.timeout = 90000; // the free-tier server can take ~45 s to wake up
 
 export const getData = async () => {
   try {

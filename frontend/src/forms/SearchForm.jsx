@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { searchImagesByKeyword, getImageDescription } from "../api/config";
 
@@ -19,12 +20,13 @@ const SearchForm = ({ allData }) => {
     if (allData && Object.keys(allData).length > 0) {
       const subjectList = Object.keys(allData).sort();
       setSubjects(subjectList);
-      setError(null);
     } else {
-      setError("Unable to load data. Please try again later.");
       setSubjects([]);
     }
   }, [allData]);
+
+  const isLoadingSubjects = !allData;
+  const isAdvanced = searchMode === 'advanced';
   
   const navigate = useNavigate();
   
@@ -33,7 +35,7 @@ const SearchForm = ({ allData }) => {
     setStandard('');
     setChapter('');
     
-    if (subject && allData[subject]) {
+    if (subject && allData?.[subject]) {
       try {
         const standardList = Object.keys(allData[subject]).sort((a, b) => {
           const numA = Number(a.replace(/\D/g, ''));
@@ -54,11 +56,10 @@ const SearchForm = ({ allData }) => {
   useEffect(() => {
     setChapter('');
     
-    if (standard && subject && allData[subject]?.[standard]) {
+    if (standard && subject && allData?.[subject]?.[standard]) {
       try {
         const standardData = allData[subject][standard];
-        console.log("Standard data:", JSON.stringify(standardData, null, 2));
-        
+
         // Simplify chapter handling - directly use the array of chapter names
         const chapterList = Array.isArray(standardData) ? standardData : Object.keys(standardData);
         
@@ -67,7 +68,6 @@ const SearchForm = ({ allData }) => {
           return a.localeCompare(b);
         });
         
-        console.log("Parsed chapters:", sortedChapters);
         setChapters(sortedChapters);
       } catch (error) {
         console.error("Error processing chapters:", error);
@@ -104,11 +104,11 @@ const SearchForm = ({ allData }) => {
       }
 
       if (response && response.success) {
-        navigate('/search-results', { 
-          state: { 
+        navigate('/search-results', {
+          state: {
             searchResults: response.data,
             searchMode,
-            searchParams: searchMode === 'keyword' 
+            searchParams: searchMode === 'keyword'
               ? { standard, subject, chapter, keyword }
               : { standard, subject, chapter, figNo }
           }
@@ -118,7 +118,11 @@ const SearchForm = ({ allData }) => {
       }
     } catch (error) {
       console.error('Search error:', error);
-      setError('Error performing search. Please try again.');
+      if (error.response?.status === 404) {
+        setError(`No figure "${figNo}" was found in that chapter. Check the figure number, or try Keyword Search.`);
+      } else {
+        setError('The search did not complete. Check your connection and try again.');
+      }
     }
   };
   
@@ -141,6 +145,7 @@ const SearchForm = ({ allData }) => {
               : 'bg-gray-800 text-white hover:bg-gray-700'
           }`}
           onClick={() => handleModeChange('keyword')}
+          aria-pressed={searchMode === 'keyword'}
         >
           Keyword Search
         </button>
@@ -152,17 +157,26 @@ const SearchForm = ({ allData }) => {
               : 'bg-gray-800 text-white hover:bg-gray-700'
           }`}
           onClick={() => handleModeChange('advanced')}
+          aria-pressed={searchMode === 'advanced'}
         >
           Advanced Search
         </button>
       </div>
 
       <form onSubmit={handleSearch} className="space-y-6">
-        {error && (
-          <div className="error-message bg-red-900/50 text-red-200 p-4 rounded-lg text-sm font-poppins-normal">
-            {error}
-          </div>
-        )}
+        <div role="alert">
+          {error && (
+            <div className="error-message bg-red-900/50 text-red-200 p-4 rounded-lg text-sm font-poppins-normal">
+              {error}
+            </div>
+          )}
+        </div>
+
+        <p role="status" className="text-gray-300 text-base">
+          {isLoadingSubjects
+            ? 'Loading subjects… The server can take up to a minute to wake up.'
+            : !isAdvanced && 'Subject, standard and chapter are optional. Use them to narrow the search.'}
+        </p>
         
         <div className="form-group">
           <label htmlFor="subject" className="block text-white font-poppins-bold mb-2 text-lg">
@@ -176,7 +190,7 @@ const SearchForm = ({ allData }) => {
                      bg-gray-800 text-white font-alegreya-normal text-lg
                      focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500
                      transition-colors"
-            required
+            required={isAdvanced}
           >
             <option value="" className="bg-gray-800">Select Subject</option>
             {subjects.map((sub) => (
@@ -199,7 +213,7 @@ const SearchForm = ({ allData }) => {
                      bg-gray-800 text-white font-alegreya-normal text-lg
                      focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500
                      transition-colors"
-            required
+            required={isAdvanced}
           >
             <option value="" className="bg-gray-800">Select Standard</option>
             {standards.map((std) => (
@@ -222,7 +236,7 @@ const SearchForm = ({ allData }) => {
                      bg-gray-800 text-white font-alegreya-normal text-lg
                      focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500
                      transition-colors"
-            required
+            required={isAdvanced}
           >
             <option value="" className="bg-gray-800">Select Chapter</option>
             {chapters.map((chap) => (
@@ -282,6 +296,10 @@ const SearchForm = ({ allData }) => {
       </form>
     </div>
   );
+};
+
+SearchForm.propTypes = {
+  allData: PropTypes.object,
 };
 
 export default SearchForm;
