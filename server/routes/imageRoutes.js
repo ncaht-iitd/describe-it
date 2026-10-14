@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const LibraryRecord = require('../models/LibraryRecord');
 const { withMedia } = require('../lib/media');
+const { collectionFilter } = require('./collectionRoutes');
 const { getOpenAIResponse } = require('../services/openai');
 
 const escapeRegex = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -22,12 +23,17 @@ function chapterNameMatch(chapter) {
 // Keyword search endpoint
 router.post('/search', async (req, res) => {
   try {
-    const { subject, chapter, keyword } = req.body;
+    const { subject, chapter, keyword, collection } = req.body;
     // The website sends the class as `grade`; older callers send `standard`.
     const classes = classVariants(req.body.standard ?? req.body.grade);
     const chapterMatch = chapterNameMatch(chapter);
 
     const searchQuery = {};
+    if (collection) {
+      const inCollection = collectionFilter(collection);
+      if (!inCollection) return res.status(400).json({ success: false, error: 'Unknown collection' });
+      searchQuery.$and = [inCollection];
+    }
     if (subject) searchQuery.subject = subject;
     if (classes) searchQuery.standard = { $in: classes };
     if (chapterMatch) searchQuery['chapter.name'] = chapterMatch;
@@ -40,6 +46,7 @@ router.post('/search', async (req, res) => {
         { description: pattern },
         { keywords: pattern },
         { 'chapter.name': pattern },
+        { subject: pattern },
         { image_name: pattern }
       ];
     }

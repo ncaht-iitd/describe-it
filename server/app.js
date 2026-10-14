@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const imageRoutes = require('./routes/imageRoutes');
+const collectionRoutes = require('./routes/collectionRoutes');
 const userUploadsRoutes = require('./routes/userUploads'); 
 const LibraryRecord = require('./models/LibraryRecord');
 const { withMedia } = require('./lib/media');
@@ -53,6 +54,7 @@ app.use((req, res, next) => {
 
 // API routes
 app.use('/api', imageRoutes);
+app.use('/api', collectionRoutes);
 app.use('/api', userUploadsRoutes);
 
 // PDF Download route
