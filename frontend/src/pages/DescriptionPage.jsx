@@ -358,25 +358,32 @@ const DescriptionPage = () => {
                 <Book className="w-6 h-6" />
               </button>
 
-              {imageDataFromSearch.pdf_url && (
-              <button
-                className={`p-2 rounded ${downloadStatus.loading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-red-500 hover:bg-red-600'} text-white transition duration-300`}
-                aria-label="Download Tactile version of the Figure"
-                onClick={handleDownload}
-                disabled={downloadStatus.loading}
-              >
-                <Download className="w-6 h-6" />
-              </button>
-              )}
             </div>
 
-            {downloadStatus.error && (
-              <div className="mt-2 text-red-500 text-sm">
-                {downloadStatus.error}
+            {/* Image, description and tactile version always stay together on this page */}
+            <section aria-labelledby="tactile-heading" className="w-full mt-6 p-4 rounded-lg border border-gray-300 bg-gray-50">
+              <h3 id="tactile-heading" className="text-lg font-bold text-gray-900 mb-2">Tactile version</h3>
+              {imageDataFromSearch.pdf_url ? (
+                <button
+                  type="button"
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded font-bold text-white transition duration-300 ${downloadStatus.loading
+                    ? 'bg-gray-500 cursor-not-allowed'
+                    : 'bg-red-700 hover:bg-red-800'}`}
+                  onClick={handleDownload}
+                  disabled={downloadStatus.loading}
+                >
+                  <Download className="w-5 h-5" aria-hidden="true" />
+                  {downloadStatus.loading ? 'Preparing download…' : 'Download tactile version (PDF)'}
+                </button>
+              ) : (
+                <p className="text-gray-700">No tactile version is available for this diagram yet.</p>
+              )}
+              <div role="alert">
+                {downloadStatus.error && (
+                  <p className="mt-2 text-red-700 text-sm">{downloadStatus.error}</p>
+                )}
               </div>
-            )}
+            </section>
 
             {showReview && (
               <div className="p-4 mt-4 bg-white rounded-lg shadow-md w-full">
