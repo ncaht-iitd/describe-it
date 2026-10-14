@@ -39,24 +39,26 @@ export const getData = async () => {
 //   }
 // }
 
-// 2. New API route for keyword search
-export async function searchImagesByKeyword(grade, subject, chapter, keyword) {
-  try {
-    const res = await axios({
-      url: `${baseURI}/api/search`,
-      method: "POST",
-      data: {
-        grade,
-        subject,
-        chapter,
-        keyword,
-      },
-    });
-    return res.data;
-  } catch (error) {
-    console.error("Error in keyword search:", error);
-    throw error;
-  }
+// Keyword search across the library, optionally within one collection
+export async function searchImagesByKeyword(keyword, collection) {
+  const res = await axios.post(`${baseURI}/api/search`, {
+    keyword,
+    collection: collection || undefined,
+  });
+  return res.data;
+}
+
+// Collections (folders) and their images, one page at a time
+export async function getCollections() {
+  const res = await axios.get(`${baseURI}/api/collections`);
+  return res.data.data;
+}
+
+export async function getCollectionImages(id, page = 1, limit = 24) {
+  const res = await axios.get(`${baseURI}/api/collections/${encodeURIComponent(id)}/images`, {
+    params: { page, limit },
+  });
+  return res.data;
 }
 
 // 3. Updated version of getImageDescription to work with optional figNo
