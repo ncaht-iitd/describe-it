@@ -46,7 +46,7 @@ async function main() {
   const missingFiles = records.filter((r) => !fs.existsSync(path.join(IMAGES, r.image_name)));
   const invalid = records.filter((r) => !r.image_name || !r.chapter.number || !r.chapter.name || !/^Class \d+$/.test(r.standard));
 
-  await mongoose.connect(process.env.MONGODB_URI);
+  await mongoose.connect(process.env.MONGODB_URI, { dbName: process.env.MONGODB_DB || 'image_descriptions' });
   const existing = new Set(
     (await LibraryRecord.find({ dataset: DATASET }, { image_name: 1 }).lean()).map((r) => r.image_name)
   );
