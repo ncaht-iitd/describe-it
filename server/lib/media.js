@@ -40,18 +40,27 @@ reload();
 
 const collectionOf = (record) => record.dataset || DEFAULT_COLLECTION;
 
+// Look a file up in the index; if it isn't there, check the disk once so files added
+// while the server runs are found without a restart.
+function findFile(folder, fileName) {
+  const key = fileName.toLowerCase();
+  if (!index[folder]) index[folder] = new Map();
+  let name = index[folder].get(key);
+  if (!name && fs.existsSync(path.join(MEDIA_DIR, folder, fileName))) {
+    name = fileName;
+    index[folder].set(key, name);
+  }
+  return name ? { folder, name } : null;
+}
+
 function imageFile(record) {
   if (!record.image_name) return null;
-  const folder = collectionOf(record);
-  const name = index[folder]?.get(record.image_name.trim().toLowerCase());
-  return name ? { folder, name } : null;
+  return findFile(collectionOf(record), record.image_name.trim());
 }
 
 function tactileFile(record) {
   if (!record.image_name) return null;
-  const pdf = record.image_name.trim().replace(/\.[a-z0-9]+$/i, '.pdf').toLowerCase();
-  const name = index[TACTILE_FOLDER].get(pdf);
-  return name ? { folder: TACTILE_FOLDER, name } : null;
+  return findFile(TACTILE_FOLDER, record.image_name.trim().replace(/\.[a-z0-9]+$/i, '.pdf'));
 }
 
 const urlFor = (file) => (file ? `${MEDIA_URL}/${file.folder}/${encodeURIComponent(file.name)}` : null);
