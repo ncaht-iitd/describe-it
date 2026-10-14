@@ -1,7 +1,8 @@
+import os
 from pymongo import MongoClient
 
-# Connect to MongoDB
-client = MongoClient("mongodb+srv://ncahtiitd:ilmWRsUUX9SVZBTw@cluster1.ihm2k.mongodb.net/image_descriptions?retryWrites=true&w=majority&appName=Cluster1")
+# Connect to MongoDB (connection string comes from the environment, never from code)
+client = MongoClient(os.environ["MONGODB_URI"])
 db = client["image_descriptions"]
 collection = db["libraryrecords"]
 

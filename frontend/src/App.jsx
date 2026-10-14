@@ -5,6 +5,7 @@ import { Layout, Alert, Spin } from 'antd';
 import HomePage from "./pages/Home";
 import DescriptionPage from "./pages/DescriptionPage";
 import SearchResults from "./pages/SearchResults";
+import CollectionPage from "./pages/CollectionPage";
 import ImageView from "./components/ImageView";
 import ImageNotFound from "./pages/ImageNotFound";
 import Login from "./forms/Login";
@@ -183,6 +184,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/description" element={<DescriptionPage />} />
           <Route path="/search-results" element={<SearchResults />} />
+          <Route path="/collections/:id" element={<CollectionPage />} />
           <Route path="/image-view/:id" element={<ImageView />} />
           <Route path="/image-not-found" element={<ImageNotFound />} />
           <Route path="/login" element={<Login />} />

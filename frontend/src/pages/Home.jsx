@@ -1,8 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { getData } from "../api/config";
+import { Link, useNavigate } from "react-router-dom";
+import { getCollections } from "../api/config";
 import { motion } from "framer-motion";
-import { message } from "antd";
 
 import "../index.css";
 import Navbar from "../components/Navbar";
@@ -16,58 +15,16 @@ import searchDescriptionGif from "../assets/images/search-description.gif";
 import brailleGif from "../assets/images/braille.gif";
 import SearchForm from "../forms/SearchForm";
 
-function Home() {             
-  const [grade, setGrade] = useState("");
-  const [subject, setSubject] = useState("");
-  const [chapter, setChapter] = useState("");
-  const [figNo, setFigNo] = useState("");
-
-  const [gradeList, setGradeList] = useState([]);
-  const [subjectList, setSubjectList] = useState([]);
-  const [chapterList, setChapterList] = useState([]);
-  const [figNoList, setFigNoList] = useState([]);
-  const [allData, setAllData] = useState(null);
-
+function Home() {
+  const [collections, setCollections] = useState([]);
+  const [collectionsError, setCollectionsError] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
 
-  const getDataBlob = async () => {
-    try {
-      const response = await getData();
-      if (response && response.success && response.data) {
-        setAllData(response.data);
-        const subjects = Object.keys(response.data);
-        setSubjectList(subjects);
-        return response.data;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
-  };
-
   useEffect(() => {
-    getDataBlob();
+    getCollections()
+      .then(setCollections)
+      .catch(() => setCollectionsError(true));
   }, []);
-
-  useEffect(() => {
-    if (allData && subject) {
-      const standards = Object.keys(allData[subject] || {});
-      setGradeList(standards);
-    }
-  }, [subject, allData]);
-
-  useEffect(() => {
-    if (allData && grade && subject) {
-      setChapterList(allData[subject][grade] || []);
-    }
-  }, [subject, grade, allData]);
-
-  useEffect(() => {
-    if (allData && grade && subject && chapter) {
-      setFigNoList(allData[grade][subject][chapter]);
-    }
-  }, [chapter, grade, subject, allData]);
 
   const aboutRef = useRef(null);
   const whyVisionTextRef = useRef(null);
@@ -95,24 +52,6 @@ function Home() {
 
   // Function to handle mouse enter/leave for GIF play/pause
   const [hoveredCard, setHoveredCard] = useState(null);
-
-  const handleTactileRequest = async (imageFile, description) => {
-    try {
-      // Store the data temporarily
-      const tempRequest = {
-        imageFile,
-        description,
-        timestamp: new Date().toISOString()
-      };
-      localStorage.setItem('pendingTactileRequest', JSON.stringify(tempRequest));
-      
-      // Redirect to login
-      navigate('/login');
-    } catch (error) {
-      console.error('Error handling tactile request:', error);
-      message.error('Failed to process your request. Please try again.');
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-black">
@@ -144,25 +83,55 @@ function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <motion.h2 
+            <motion.h1 
               className="text-2xl md:text-6xl font-poppins-normal mb-4 md:mb-8 text-center"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.7 }}
             >
               Search for Image <br /> Descriptions with Us
-            </motion.h2>
+            </motion.h1>
             <motion.div
               className="w-full"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.9 }}
             >
-              <SearchForm allData={allData} />
+              <SearchForm collections={collections} />
             </motion.div>
           </motion.div>
         </div>
       </motion.div>
+
+      {/* Browse collections */}
+      <section aria-labelledby="browse-heading" className="bg-gray-900 py-16">
+        <div className="container mx-auto px-8">
+          <h2 id="browse-heading" className="text-4xl font-poppins-bold mb-4 text-yellow-400 text-center">
+            Browse the collections
+          </h2>
+          <p className="text-gray-200 text-lg mb-10 text-center max-w-2xl mx-auto">
+            Explore every diagram in a collection, or use the search above to find something specific.
+          </p>
+          <p role="status" className="text-gray-200 text-center">
+            {collectionsError
+              ? 'The collections did not load. Reload the page to try again.'
+              : collections.length === 0 && 'Loading collections… The server can take up to a minute to wake up.'}
+          </p>
+          <ul className="grid grid-cols-1 md:grid-cols-3 gap-8 list-none p-0">
+            {collections.map((c) => (
+              <li key={c.id} className="relative bg-gray-800 rounded-xl p-8 border border-gray-700 shadow-xl hover:border-yellow-400 focus-within:ring-4 focus-within:ring-yellow-400">
+                <h3 className="text-2xl font-poppins-bold mb-2 text-yellow-400">
+                  <Link to={`/collections/${c.id}`} className="after:absolute after:inset-0 hover:underline focus:outline-none">
+                    {c.title}
+                  </Link>
+                </h3>
+                <p className="text-white text-lg font-bold mb-3">{c.count} diagrams</p>
+                <p className="text-gray-200">{c.description}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
       {/* Document Tools Section */}
       <div className="bg-gradient-to-b from-gray-900 to-gray-800 py-16">

@@ -1,19 +1,19 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Chatbot from "../components/Chatbot";  
 import AccessibilityMenu from "../components/AccessibilityMenu";
 import LoadingSpinner from "../components/LoadingSpinner";
 
-import { Book, Search, Download, FileEdit } from 'lucide-react';
+import { Book, Download, FileEdit } from 'lucide-react';
 
 import logo from "../assets/images/NCAHT-Logo.png";
 
 import "../index.css";
 import HTMLparser from "../components/HTMLparser";
-import { getData, getImageDescription, updateUserReview, getPdfDownloadUrl } from "../api/config";
+import { figureLabel } from "../lib/figures";
+import { getImageDescription, updateUserReview, getPdfDownloadUrl } from "../api/config";
 
 const DescriptionPage = () => {
-  const [searchParams] = useSearchParams();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -46,25 +46,10 @@ const DescriptionPage = () => {
   const figNo = imageDataFromSearch?.fig_no;
   const image_name = imageDataFromSearch?.image_name;
 
-  // Set title based on available data
+  // Readable title, e.g. "Prime Time, diagram 2", instead of the file name
   useEffect(() => {
-    if (imageDataFromSearch) {
-      if (figNo && figNo.trim() !== '') {
-        setTitle(`${imageDataFromSearch.chapter.name} - Figure ${figNo}`);
-      } else if (image_name) {
-        // Remove file extension and convert underscores to spaces
-        const cleanName = image_name
-          .replace(/\.[^/.]+$/, "") // Remove file extension
-          .replace(/_/g, " ") // Replace underscores with spaces
-          .split(/[_-]/) // Split by underscores or hyphens
-          .pop() // Get the last part (usually the diagram number)
-          .trim();
-        setTitle(`${imageDataFromSearch.chapter.name} - Diagram ${cleanName}`);
-      } else {
-        setTitle(imageDataFromSearch.chapter.name);
-      }
-    }
-  }, [imageDataFromSearch, figNo, image_name]);
+    if (imageDataFromSearch) setTitle(figureLabel(imageDataFromSearch));
+  }, [imageDataFromSearch]);
 
   // Debug log with more details about data extraction
   console.log('Parameters:', {
@@ -352,13 +337,17 @@ const DescriptionPage = () => {
           aria-label="Figure Description and Details"
         >
           <div className="w-full md:w-1/2 flex flex-col items-center">
-            <img 
-              src={imgUrl} 
-              alt={title || "Figure"}
-              className="w-full mb-4 rounded-lg shadow-md" 
-              style={{ maxHeight: '500px', objectFit: 'contain' }}
-              aria-describedby="image-description"
-            />
+            {imgUrl ? (
+              <img 
+                src={imgUrl} 
+                alt={title || "Figure"}
+                className="w-full mb-4 rounded-lg shadow-md" 
+                style={{ maxHeight: '500px', objectFit: 'contain' }}
+                aria-describedby={description ? "image-description" : undefined}
+              />
+            ) : (
+              <p className="w-full mb-4 p-8 text-center bg-gray-100 text-gray-700 rounded-lg">Image not available</p>
+            )}
 
             <div className="flex space-x-4 mt-4">
               <button
@@ -369,23 +358,32 @@ const DescriptionPage = () => {
                 <Book className="w-6 h-6" />
               </button>
 
-              <button
-                className={`p-2 rounded ${downloadStatus.loading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
-                  : 'bg-red-500 hover:bg-red-600'} text-white transition duration-300`}
-                aria-label="Download Tactile version of the Figure"
-                onClick={handleDownload}
-                disabled={downloadStatus.loading}
-              >
-                <Download className="w-6 h-6" />
-              </button>
             </div>
 
-            {downloadStatus.error && (
-              <div className="mt-2 text-red-500 text-sm">
-                {downloadStatus.error}
+            {/* Image, description and tactile version always stay together on this page */}
+            <section aria-labelledby="tactile-heading" className="w-full mt-6 p-4 rounded-lg border border-gray-300 bg-gray-50">
+              <h3 id="tactile-heading" className="text-lg font-bold text-gray-900 mb-2">Tactile version</h3>
+              {imageDataFromSearch.pdf_url ? (
+                <button
+                  type="button"
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded font-bold text-white transition duration-300 ${downloadStatus.loading
+                    ? 'bg-gray-500 cursor-not-allowed'
+                    : 'bg-red-700 hover:bg-red-800'}`}
+                  onClick={handleDownload}
+                  disabled={downloadStatus.loading}
+                >
+                  <Download className="w-5 h-5" aria-hidden="true" />
+                  {downloadStatus.loading ? 'Preparing download…' : 'Download tactile version (PDF)'}
+                </button>
+              ) : (
+                <p className="text-gray-700">No tactile version is available for this diagram yet.</p>
+              )}
+              <div role="alert">
+                {downloadStatus.error && (
+                  <p className="mt-2 text-red-700 text-sm">{downloadStatus.error}</p>
+                )}
               </div>
-            )}
+            </section>
 
             {showReview && (
               <div className="p-4 mt-4 bg-white rounded-lg shadow-md w-full">
@@ -411,8 +409,10 @@ const DescriptionPage = () => {
               {title}
             </h2>
             
-            <div className="prose max-w-none mb-6">
-              <HTMLparser htmlString={description} />
+            <div id="image-description" className="prose max-w-none mb-6">
+              {description
+                ? <HTMLparser htmlString={description} />
+                : <p className="italic text-gray-700">Description not written yet.</p>}
             </div>
 
             <div className="flex space-x-4 items-center mt-auto">

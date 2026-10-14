@@ -1,4 +1,5 @@
 const { OpenAI } = require("openai");
+const { imageDataUrl } = require("../lib/media");
 
 const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
     try {
@@ -18,10 +19,12 @@ const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
       }
 
       // Destructure all needed fields from the record
-      const { description, subject, chapter, standard, image_url, title, fig_no } = record;
+      const { description, subject, chapter, standard, fig_no } = record;
+      // Send the image itself rather than a link, so it works without public file hosting
+      const image_url = imageDataUrl(record);
       
       if (!image_url) {
-        throw new Error("Image URL not found in the record");
+        throw new Error("No image file found for this record");
       }
       
       // Construct the messages array with both text and image
@@ -35,7 +38,7 @@ const getOpenAIResponse = async (record, user_query, language = 'en-US') => {
           content: [
             {
               type: "text",
-              text: `Context: ${subject}, ${standard}, Chapter: ${chapter}, Figure ${fig_no}
+              text: `Context: ${subject}, ${standard}, Chapter: ${chapter?.name?.trim() || chapter}${fig_no ? `, ${fig_no}` : ""}
               
               Original description: "${description}"
               

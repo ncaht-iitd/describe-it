@@ -1,37 +1,53 @@
 const express = require('express');
 const router = express.Router();
-const LibraryRecord = require('../models/LibraryRecord'); 
+const LibraryRecord = require('../models/LibraryRecord');
+const { withMedia } = require('../lib/media');
+const { collectionFilter } = require('./collectionRoutes');
 const { getOpenAIResponse } = require('../services/openai');
+
+const escapeRegex = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+// The data stores class as "Class 6", "Class-6" or "class 6". Accept 6, "6" or any of those forms.
+function classVariants(input) {
+  const n = String(input ?? '').match(/\d+/)?.[0];
+  return n ? [`Class ${n}`, `Class-${n}`, `class ${n}`] : null;
+}
+
+// Chapter names in the data can carry stray spaces; match a name with or without them.
+function chapterNameMatch(chapter) {
+  const name = chapter && typeof chapter === 'object' ? chapter.name : chapter;
+  if (!name || !String(name).trim()) return null;
+  return { $regex: `^\\s*${escapeRegex(String(name).trim())}\\s*$` };
+}
 
 // Keyword search endpoint
 router.post('/search', async (req, res) => {
   try {
-    const { subject, standard, chapter, keyword } = req.body;
-    
-    // Build the search query based on provided parameters
+    const { subject, chapter, keyword, collection } = req.body;
+    // The website sends the class as `grade`; older callers send `standard`.
+    const classes = classVariants(req.body.standard ?? req.body.grade);
+    const chapterMatch = chapterNameMatch(chapter);
+
     const searchQuery = {};
-    
-    // Add filters for required fields if provided
-    if (subject) searchQuery.subject = subject;
-    if (standard) {
-      searchQuery.standard = {
-        $or: [
-          `Class ${standard}`,
-          `Class-${standard}`,
-          `class ${standard}`
-        ]
-      };
+    if (collection) {
+      const inCollection = collectionFilter(collection);
+      if (!inCollection) return res.status(400).json({ success: false, error: 'Unknown collection' });
+      searchQuery.$and = [inCollection];
     }
-    if (chapter) searchQuery['chapter.name'] = chapter;
-    
-    // Add keyword search conditions if provided
-    if (keyword) {
+    if (subject) searchQuery.subject = subject;
+    if (classes) searchQuery.standard = { $in: classes };
+    if (chapterMatch) searchQuery['chapter.name'] = chapterMatch;
+
+    // Keywords are matched as plain text, never as a pattern
+    const term = String(keyword ?? '').trim();
+    if (term) {
+      const pattern = { $regex: escapeRegex(term), $options: 'i' };
       searchQuery.$or = [
-        { description: { $regex: keyword, $options: 'i' } },
-        { keywords: { $regex: keyword, $options: 'i' } },
-        { 'queries.keywords': { $regex: keyword, $options: 'i' } },
-        { 'chapter.name': { $regex: keyword, $options: 'i' } },
-        { image_name: { $regex: keyword, $options: 'i' } }
+        { description: pattern },
+        { keywords: pattern },
+        { 'chapter.name': pattern },
+        { subject: pattern },
+        { image_name: pattern }
       ];
     }
     
@@ -45,7 +61,7 @@ router.post('/search', async (req, res) => {
     res.status(200).json({
       success: true,
       count: results.length,
-      data: results
+      data: results.map(withMedia)
     });
     
   } catch (error) {
@@ -73,16 +89,19 @@ router.post('/chapterImages', async (req, res) => {
       });
     }
     
-    // Format the query based on the data structure
-    // Try different standard formats
+    const classes = classVariants(grade);
+    const chapterMatch = chapterNameMatch(chapter);
+    if (!classes || !chapterMatch) {
+      return res.status(400).json({
+        success: false,
+        error: "grade must contain a class number and chapter must be a chapter name"
+      });
+    }
+
     const query = {
-      $or: [
-        { standard: `Class ${grade}` },
-        { standard: `Class-${grade}` },
-        { standard: `class ${grade}` }
-      ],
+      standard: { $in: classes },
       subject: subject,
-      chapter: chapter
+      'chapter.name': chapterMatch
     };
     
     console.log('Executing query:', query);
@@ -101,7 +120,7 @@ router.post('/chapterImages', async (req, res) => {
     res.status(200).json({
       success: true,
       count: images.length,
-      data: images
+      data: images.map(withMedia)
     });
     
   } catch (error) {
@@ -130,6 +149,7 @@ router.post('/figData', async (req, res) => {
   if (!grade || !subject || !chapter || !figNo) {
     console.log('Missing required fields in request');
     return res.status(400).json({
+      success: false,
       error: "Missing required fields",
       details: {
         grade: !grade ? "Grade is required" : null,
@@ -143,25 +163,21 @@ router.post('/figData', async (req, res) => {
   try {
     // Log the query we're about to make
     const query = {
-      $or: [
-        { standard: `Class ${grade}` },
-        { standard: `Class-${grade}` },
-        { standard: `class ${grade}` }
-      ],
+      standard: { $in: classVariants(grade) || [] },
       subject: subject,
-      chapter: chapter,
-      fig_no: figNo,
+      'chapter.name': chapterNameMatch(chapter),
+      fig_no: String(figNo).trim(),
       book: "NCERT"
     };
     console.log('Searching with query:', query);
 
     const data = await LibraryRecord.findOne(query);
-    
+
     if (!data) {
       console.log('No matching record found');
       return res.status(404).json({
-        error: "Figure not found",
-        searchCriteria: query
+        success: false,
+        error: "Figure not found"
       });
     }
 
@@ -173,7 +189,8 @@ router.post('/figData', async (req, res) => {
       fig_no: data.fig_no
     });
 
-    return res.status(200).json(data);
+    // Same shape as /search and /chapterImages so the website can show it as a result list
+    return res.status(200).json({ success: true, count: 1, data: [withMedia(data)] });
   } catch (err) {
     console.error('Error in /figData:', err);
     return res.status(500).json({
@@ -197,7 +214,7 @@ router.get('/image/:id', async (req, res) => {
     
     res.status(200).json({
       success: true,
-      data: image
+      data: withMedia(image)
     });
     
   } catch (error) {

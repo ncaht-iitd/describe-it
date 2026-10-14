@@ -1,2 +1,16 @@
 node_modules
+dist
+
+# Secrets: never commit real environment files
 .env
+.env.*
+!.env.example
+
+# Private working notes (repo is public)
+docs/audit/
+describe-it-audit.md
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+*.log
