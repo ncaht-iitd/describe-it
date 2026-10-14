@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const LibraryRecord = require('../models/LibraryRecord'); 
+const LibraryRecord = require('../models/LibraryRecord');
+const { withMedia } = require('../lib/media');
 const { getOpenAIResponse } = require('../services/openai');
 
 const escapeRegex = (text) => String(text).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -53,7 +54,7 @@ router.post('/search', async (req, res) => {
     res.status(200).json({
       success: true,
       count: results.length,
-      data: results
+      data: results.map(withMedia)
     });
     
   } catch (error) {
@@ -112,7 +113,7 @@ router.post('/chapterImages', async (req, res) => {
     res.status(200).json({
       success: true,
       count: images.length,
-      data: images
+      data: images.map(withMedia)
     });
     
   } catch (error) {
@@ -182,7 +183,7 @@ router.post('/figData', async (req, res) => {
     });
 
     // Same shape as /search and /chapterImages so the website can show it as a result list
-    return res.status(200).json({ success: true, count: 1, data: [data] });
+    return res.status(200).json({ success: true, count: 1, data: [withMedia(data)] });
   } catch (err) {
     console.error('Error in /figData:', err);
     return res.status(500).json({
@@ -206,7 +207,7 @@ router.get('/image/:id', async (req, res) => {
     
     res.status(200).json({
       success: true,
-      data: image
+      data: withMedia(image)
     });
     
   } catch (error) {

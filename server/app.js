@@ -5,7 +5,8 @@ const mongoose = require("mongoose");
 
 const imageRoutes = require('./routes/imageRoutes');
 const userUploadsRoutes = require('./routes/userUploads'); 
-const LibraryRecord = require('./models/LibraryRecord'); 
+const LibraryRecord = require('./models/LibraryRecord');
+const { withMedia } = require('./lib/media');
 
 require("dotenv").config();
 
@@ -78,7 +79,7 @@ app.post('/api/pdf/download', async (req, res) => {
     console.log('Database query:', query);
 
     // Find the document
-    const document = await LibraryRecord.findOne(query);
+    const document = withMedia(await LibraryRecord.findOne(query));
 
     if (!document) {
       console.log('No document found for query');
