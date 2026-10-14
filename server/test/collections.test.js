@@ -2,7 +2,7 @@ const { test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 const mongoose = require("mongoose");
 const request = require("supertest");
-const { MongoMemoryServer } = require("mongodb-memory-server");
+const { MongoMemoryServer } = require("mongodb-memory-server-core");
 
 const app = require("../app");
 const LibraryRecord = require("../models/LibraryRecord");
