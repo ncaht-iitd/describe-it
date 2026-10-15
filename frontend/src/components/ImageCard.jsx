@@ -1,65 +1,56 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { figureLabel, descriptionLink } from '../lib/figures';
 
-// One diagram in a results or collection grid. The title link covers the whole
-// card for mouse users; keyboard and screen-reader users reach it with Tab.
+// First sentence of the description, as a one-line summary for the card
+const summaryOf = (text) => {
+  const t = (text || '').replace(/\s+/g, ' ').trim();
+  const first = t.match(/^.*?[.!?](\s|$)/)?.[0] || t;
+  return first.length > 160 ? `${first.slice(0, first.lastIndexOf(' ', 157))}…` : first;
+};
+
+// One diagram in a grid. Card order follows the design guide: thumbnail, title,
+// summary, chips. The title is the only link (one tab stop); its ::after covers the card.
 const ImageCard = ({ image }) => {
-  const [expanded, setExpanded] = useState(false);
-  const descriptionId = `desc-${image._id}`;
   const chapter = image.chapter?.name?.replace(/\s+/g, ' ').trim();
+  const grade = image.standard?.match(/\d+/)?.[0];
 
   return (
-    <li className="image-card relative bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow focus-within:ring-4 focus-within:ring-yellow-400">
-      <div className="image-container relative aspect-video bg-white flex items-center justify-center">
+    <li className="card relative flex flex-col overflow-hidden hover:border-accent focus-within:border-accent transition-colors duration-150">
+      <div className="relative aspect-[4/3] bg-white border-b border-theme border-line flex items-center justify-center">
         {image.image_url ? (
-          // The visible title and description carry the meaning, so the thumbnail is decorative
-          <img src={image.image_url} alt="" loading="lazy" className="w-full h-full object-contain p-2" />
+          // Title and summary below carry the meaning, so the thumbnail itself is decorative
+          <img src={image.image_url} alt="" loading="lazy" className="absolute inset-0 w-full h-full object-contain p-3" />
         ) : (
-          <p className="text-gray-600 text-sm">Image not available</p>
+          <p className="text-small text-muted">Image not available</p>
         )}
       </div>
-      <div className="image-details p-5">
-        <h2 className="text-lg font-bold mb-3 text-gray-900 dark:text-yellow-400">
+      <div className="p-4 flex flex-col gap-2 flex-1">
+        <h3 className="text-h3">
           <Link
             to={descriptionLink(image)}
             state={{ imageData: image }}
-            className="after:absolute after:inset-0 hover:underline focus:outline-none"
+            className="text-ink no-underline hover:underline after:absolute after:inset-0"
           >
             {figureLabel(image)}
           </Link>
-        </h2>
-        <p className="text-sm text-gray-700 dark:text-yellow-200">
-          {[image.subject, image.standard, chapter].filter(Boolean).join(' · ')}
+        </h3>
+        <p className={`text-small ${image.description ? 'text-muted' : 'text-muted italic'}`}>
+          {image.description ? summaryOf(image.description) : 'Description not written yet.'}
         </p>
-        {image.pdf_url && (
-          <p className="mt-2 inline-block text-xs font-bold bg-yellow-100 text-yellow-900 rounded-full px-2 py-1">
-            Tactile version available
-          </p>
-        )}
-        {image.description ? (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-            <p id={descriptionId} className={`text-gray-700 dark:text-yellow-100/90 ${expanded ? '' : 'line-clamp-3'}`}>
-              {image.description}
-            </p>
-            {image.description.length > 150 && (
-              <button
-                type="button"
-                onClick={() => setExpanded(!expanded)}
-                aria-expanded={expanded}
-                aria-controls={descriptionId}
-                className="relative z-10 mt-2 text-yellow-800 hover:text-yellow-900 dark:text-yellow-400 dark:hover:text-yellow-300 font-medium underline"
-              >
-                {expanded ? 'Show less' : 'Show full description'}
-              </button>
-            )}
-          </div>
-        ) : (
-          <p className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-300 italic">
-            Description not written yet.
-          </p>
-        )}
+        <ul className="mt-auto pt-2 flex flex-wrap gap-2 list-none p-0 m-0" aria-label="Details">
+          {image.subject && <li className="chip">{image.subject}</li>}
+          {grade && <li className="chip">Class {grade}</li>}
+          {chapter && image.fig_no && <li className="chip">{chapter}</li>}
+          {image.pdf_url && (
+            <li className="chip border-accent text-accent font-bold">
+              <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+                {[3, 8, 13].map((x) => [4, 12].map((y) => <circle key={`${x}${y}`} cx={x} cy={y} r="2" fill="currentColor" />))}
+              </svg>
+              Tactile PDF
+            </li>
+          )}
+        </ul>
       </div>
     </li>
   );
@@ -74,6 +65,7 @@ ImageCard.propTypes = {
     subject: PropTypes.string,
     standard: PropTypes.string,
     description: PropTypes.string,
+    fig_no: PropTypes.string,
     chapter: PropTypes.shape({ name: PropTypes.string }),
   }).isRequired,
 };

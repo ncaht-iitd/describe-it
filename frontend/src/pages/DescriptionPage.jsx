@@ -1,14 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import Chatbot from "../components/Chatbot";  
-import AccessibilityMenu from "../components/AccessibilityMenu";
-import LoadingSpinner from "../components/LoadingSpinner";
 
-import { Book, Download, FileEdit } from 'lucide-react';
+import { Download } from 'lucide-react';
 
-import logo from "../assets/images/NCAHT-Logo.png";
 
-import "../index.css";
 import HTMLparser from "../components/HTMLparser";
 import { figureLabel } from "../lib/figures";
 import { getImageDescription, updateUserReview, getPdfDownloadUrl } from "../api/config";
@@ -30,13 +26,44 @@ const DescriptionPage = () => {
   const [reviews, setReviews] = useState(imageDataFromSearch?.reviews || []);
   
   // UI state
-  const [showReview, setShowReview] = useState(false);
   const [userReview, setUserReview] = useState("");
-  const [showUserReview, setShowUserReview] = useState(false);
   const [reviewStatus, setReviewStatus] = useState({ type: '', message: '' });
 
   // Add new state for download status
   const [downloadStatus, setDownloadStatus] = useState({ loading: false, error: null });
+  const [actionStatus, setActionStatus] = useState('');
+  const [speaking, setSpeaking] = useState(false);
+
+  useEffect(() => { if (title) document.title = `${title} | Describe-it`; }, [title]);
+  // Stop any reading when leaving the page
+  useEffect(() => () => window.speechSynthesis?.cancel(), []);
+
+  const plainDescription = () => {
+    const el = document.createElement('div');
+    el.innerHTML = description;
+    return el.textContent || '';
+  };
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(plainDescription());
+      setActionStatus('Description copied.');
+    } catch {
+      setActionStatus('Copying is not allowed here. Select the text and copy it instead.');
+    }
+  };
+
+  const handleReadAloud = () => {
+    const synth = window.speechSynthesis;
+    if (speaking) { synth.cancel(); setSpeaking(false); return; }
+    const utterance = new SpeechSynthesisUtterance(plainDescription());
+    utterance.lang = 'en-IN';
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    synth.cancel();
+    synth.speak(utterance);
+    setSpeaking(true);
+  };
 
   // Extract data from imageDataFromSearch or URL params as fallback
   const standardMatch = imageDataFromSearch?.standard?.match(/Class[- ](\d+)/i);
@@ -146,7 +173,6 @@ const DescriptionPage = () => {
       await updateUserReview(userReview, grade, subject, chapter, figNo, imageDataFromSearch);
       setReviews(prev => [...prev, userReview]);
       setUserReview("");
-      setShowUserReview(false);
       setReviewStatus({ type: 'success', message: 'Review submitted successfully!' });
 
       // Clear success message after 3 seconds
@@ -268,219 +294,150 @@ const DescriptionPage = () => {
 
   if (!imageDataFromSearch) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-red-500 mb-4">No image data available. Please select an image from the search results.</p>
-        <button
-          onClick={() => navigate('/')}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Go to Search
-        </button>
+      <div className="page prose-measure">
+        <h1 className="text-h1 mb-4">Diagram not found</h1>
+        <p className="mb-6">Open a diagram from a collection or from search results.</p>
+        <button type="button" onClick={() => navigate('/')} className="btn-primary">Go to search</button>
       </div>
     );
   }
 
   if (loading) {
-    return <LoadingSpinner />;
+    return <p role="status" className="page">Loading the diagram…</p>;
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button
-          onClick={() => navigate(-1)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Go Back
-        </button>
+      <div className="page">
+        <p role="alert" className="text-error font-bold mb-4">{error}</p>
+        <button type="button" onClick={() => navigate(-1)} className="btn-secondary">Go back</button>
       </div>
     );
   }
 
+  const collectionTitle = {
+    'ncert-old': 'NCERT diagrams (old edition)',
+    'ncert-science': 'NCERT Science 6–10 (new edition)',
+  }[imageDataFromSearch.dataset];
+  const chapterName = imageDataFromSearch.chapter?.name?.replace(/\s+/g, ' ').trim();
+
   return (
-    <>
-      {loading && <LoadingSpinner />}
-      <div 
-        className={`min-h-screen flex flex-col items-center justify-center bg-white dark:bg-gray-900 ${loading ? 'opacity-50 pointer-events-none' : ''}`}
-        aria-label="Describe-it description page"
-      >
-        <AccessibilityMenu />
-        
-        <div className="absolute top-4 left-4">
-          <a 
-            href="/" 
-            className="font-poppins-bold text-2xl text-yellow-500 hover:text-yellow-600 transition-colors"
-            aria-label="Go to homepage"
-          >
-            Describe-it
-          </a>
-        </div>
+    <div className="page">
+      <nav aria-label="Breadcrumb" className="mb-4 text-small">
+        <ol className="flex flex-wrap gap-2 list-none p-0 m-0">
+          <li><Link to="/collections">Collections</Link><span aria-hidden="true" className="ml-2 text-muted">/</span></li>
+          {collectionTitle && (
+            <li><Link to={`/collections/${imageDataFromSearch.dataset}`}>{collectionTitle}</Link><span aria-hidden="true" className="ml-2 text-muted">/</span></li>
+          )}
+          <li aria-current="page" className="text-muted">{title}</li>
+        </ol>
+      </nav>
 
-        <div className="absolute top-4 right-4 flex items-center space-x-4">
-          <a
-            href="https://www.ncaht.in/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <img
-              src={logo}
-              alt="NCAHT Logo"
-              className="h-12"
-            />
-          </a>
-        </div>
+      <h1 className="text-h1 mb-3">{title}</h1>
+      <ul className="flex flex-wrap gap-2 list-none p-0 m-0 mb-8" aria-label="Details">
+        {imageDataFromSearch.subject && <li className="chip">{imageDataFromSearch.subject}</li>}
+        {grade && <li className="chip">Class {grade}</li>}
+        {chapterName && <li className="chip">Chapter: {chapterName}</li>}
+      </ul>
 
-        <div 
-          className="w-full max-w-4xl p-8 bg-white shadow-md rounded-lg flex flex-col md:flex-row gap-8 mt-20"
-          role="main"
-          aria-label="Figure Description and Details"
-        >
-          <div className="w-full md:w-1/2 flex flex-col items-center">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] items-start">
+        <div className="space-y-6">
+          <figure className="card p-4 m-0 bg-white">
             {imgUrl ? (
-              <img 
-                src={imgUrl} 
-                alt={title || "Figure"}
-                className="w-full mb-4 rounded-lg shadow-md" 
-                style={{ maxHeight: '500px', objectFit: 'contain' }}
-                aria-describedby={description ? "image-description" : undefined}
+              <img
+                src={imgUrl}
+                alt={title || 'Diagram'}
+                aria-describedby={description ? 'image-description' : undefined}
+                className="w-full max-h-[32rem] object-contain"
               />
             ) : (
-              <p className="w-full mb-4 p-8 text-center bg-gray-100 text-gray-700 rounded-lg">Image not available</p>
+              <p className="p-8 text-center text-muted">Image not available</p>
             )}
+          </figure>
 
-            <div className="flex space-x-4 mt-4">
-              <button
-                className="p-2 rounded bg-green-500 text-white hover:bg-green-600 transition duration-300"
-                aria-label="Read reviews by other students"
-                onClick={() => setShowReview(!showReview)}
-              >
-                <Book className="w-6 h-6" />
-              </button>
-
-            </div>
-
-            {/* Image, description and tactile version always stay together on this page */}
-            <section aria-labelledby="tactile-heading" className="w-full mt-6 p-4 rounded-lg border border-gray-300 bg-gray-50">
-              <h3 id="tactile-heading" className="text-lg font-bold text-gray-900 mb-2">Tactile version</h3>
-              {imageDataFromSearch.pdf_url ? (
-                <button
-                  type="button"
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded font-bold text-white transition duration-300 ${downloadStatus.loading
-                    ? 'bg-gray-500 cursor-not-allowed'
-                    : 'bg-red-700 hover:bg-red-800'}`}
-                  onClick={handleDownload}
-                  disabled={downloadStatus.loading}
-                >
+          {/* Image, description and tactile version always stay together on this page */}
+          <section aria-labelledby="tactile-heading" className="card p-5">
+            <h2 id="tactile-heading" className="text-h3 mb-2">Tactile version</h2>
+            {imageDataFromSearch.pdf_url ? (
+              <>
+                <p className="text-small text-muted mb-4">PDF ready to print on swell paper or emboss.</p>
+                <button type="button" className="btn-primary" onClick={handleDownload} aria-disabled={downloadStatus.loading}>
                   <Download className="w-5 h-5" aria-hidden="true" />
-                  {downloadStatus.loading ? 'Preparing download…' : 'Download tactile version (PDF)'}
+                  {downloadStatus.loading ? 'Preparing download…' : 'Download tactile file (PDF)'}
                 </button>
-              ) : (
-                <p className="text-gray-700">No tactile version is available for this diagram yet.</p>
-              )}
-              <div role="alert">
-                {downloadStatus.error && (
-                  <p className="mt-2 text-red-700 text-sm">{downloadStatus.error}</p>
-                )}
-              </div>
-            </section>
-
-            {showReview && (
-              <div className="p-4 mt-4 bg-white rounded-lg shadow-md w-full">
-                <h3 className="text-lg font-bold border-b pb-2 mb-4 text-gray-800">
-                  Reviews
-                </h3>
-                <ul className="max-h-64 overflow-auto space-y-4">
-                  {reviews.map((review, idx) => (
-                    <li
-                      key={idx}
-                      className="p-4 bg-gray-100 rounded-lg border border-gray-200 shadow-sm"
-                    >
-                      {review}
-                    </li>
-                  ))}
-                </ul>
-              </div>
+              </>
+            ) : (
+              <p className="text-muted">No tactile version is available for this diagram yet.</p>
             )}
-          </div>
+            <div role="alert">
+              {downloadStatus.error && <p className="mt-3 text-error font-bold">{downloadStatus.error}</p>}
+            </div>
+          </section>
+        </div>
 
-          <div className="w-full md:w-1/2 flex flex-col">
-            <h2 className="text-2xl font-bold mb-4 text-gray-900">
-              {title}
-            </h2>
-            
-            <div id="image-description" className="prose max-w-none mb-6">
+        <div className="space-y-6">
+          <section aria-labelledby="description-heading" className="card p-6">
+            <h2 id="description-heading" className="text-h2 mb-4">Description</h2>
+            <div id="image-description" className="prose-measure text-body-lg">
               {description
                 ? <HTMLparser htmlString={description} />
-                : <p className="italic text-gray-700">Description not written yet.</p>}
+                : <p className="italic text-muted">Description not written yet.</p>}
             </div>
-
-            <div className="flex space-x-4 items-center mt-auto">
-              <button
-                className="flex items-center p-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition duration-300"
-                aria-label="Add Review"
-                onClick={() => setShowUserReview(!showUserReview)}
-              >
-                <FileEdit className="w-6 h-6" />
-              </button>
-
-              <button
-                onClick={() => navigate(-1)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition duration-300"
-              >
-                Go Back
-              </button>
-            </div>
-
-            {showUserReview && (
-              <form
-                onSubmit={handleUserReview}
-                className="mt-6 flex flex-col space-y-4 bg-white rounded-lg shadow-lg p-4"
-              >
-                <textarea
-                  value={userReview}
-                  onChange={(e) => setUserReview(e.target.value)}
-                  className="p-3 h-40 resize-none bg-gray-100 text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Write your review here..."
-                  aria-label="Write your review"
-                  disabled={reviewStatus.type === 'loading'}
-                />
-                {reviewStatus.message && (
-                  <div 
-                    className={`p-3 rounded ${
-                      reviewStatus.type === 'error' ? 'bg-red-100 text-red-700' :
-                      reviewStatus.type === 'success' ? 'bg-green-100 text-green-700' :
-                      reviewStatus.type === 'loading' ? 'bg-blue-100 text-blue-700' :
-                      ''
-                    }`}
-                    role="alert"
-                  >
-                    {reviewStatus.message}
-                  </div>
+            {description && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button type="button" className="btn-secondary" onClick={handleCopy}>Copy</button>
+                {'speechSynthesis' in window && (
+                  <button type="button" className="btn-secondary" onClick={handleReadAloud}>
+                    {speaking ? 'Stop reading' : 'Read aloud'}
+                  </button>
                 )}
-                <button
-                  type="submit"
-                  className={`py-2 px-4 rounded transition-colors duration-300 ${
-                    reviewStatus.type === 'loading'
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-blue-500 hover:bg-blue-600 text-white'
-                  }`}
-                  disabled={reviewStatus.type === 'loading'}
-                >
-                  {reviewStatus.type === 'loading' ? 'Submitting...' : 'Submit Review'}
-                </button>
-              </form>
+              </div>
+            )}
+            <p aria-live="polite" className="mt-3 text-small text-success font-bold min-h-[1.5em]">{actionStatus}</p>
+          </section>
+
+          <section aria-labelledby="feedback-heading" className="card p-6">
+            <h2 id="feedback-heading" className="text-h3 mb-2">Feedback on this description</h2>
+            <p className="text-small text-muted mb-4">Is something missing, unclear or wrong? Tell us and we will improve it.</p>
+
+            {reviews.length > 0 && (
+              <details className="mb-4">
+                <summary className="cursor-pointer font-bold text-accent">Read feedback from others ({reviews.length})</summary>
+                <ul className="mt-3 space-y-3 list-none p-0">
+                  {reviews.map((review, idx) => (
+                    <li key={idx} className="p-3 rounded-control bg-accent-tint">{review}</li>
+                  ))}
+                </ul>
+              </details>
             )}
 
-            <Chatbot 
-              figNo={figNo}
-              description={description}
-              imageData={imageDataFromSearch}
-            />
-          </div>
+            <form onSubmit={handleUserReview} noValidate>
+              <label htmlFor="feedback-text" className="field-label">Your feedback</label>
+              <textarea
+                id="feedback-text"
+                value={userReview}
+                onChange={(e) => setUserReview(e.target.value)}
+                rows={4}
+                className="field py-3 min-h-[7rem]"
+                aria-describedby={reviewStatus.message ? 'feedback-status' : undefined}
+              />
+              <div role="alert">
+                {reviewStatus.message && (
+                  <p id="feedback-status" className={`mt-2 font-bold ${reviewStatus.type === 'error' ? 'text-error' : 'text-success'}`}>
+                    {reviewStatus.message}
+                  </p>
+                )}
+              </div>
+              <button type="submit" className="btn-primary mt-4" aria-disabled={reviewStatus.type === 'loading'}>
+                {reviewStatus.type === 'loading' ? 'Sending…' : 'Send feedback'}
+              </button>
+            </form>
+          </section>
         </div>
       </div>
-    </>
+
+      <Chatbot figNo={figNo} description={description} imageData={imageDataFromSearch} />
+    </div>
   );
 };
 

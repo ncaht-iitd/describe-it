@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { searchImagesByKeyword } from '../api/config';
@@ -11,13 +11,16 @@ const SearchForm = ({ collections = [] }) => {
   const [error, setError] = useState(null);
   const [searching, setSearching] = useState(false);
   const navigate = useNavigate();
+  const id = useId();
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setError(null);
     const term = keyword.trim();
     if (!term) {
-      setError('Enter a word to search for, for example "magnet" or "triangle".');
+      setError('Type a word to search for, for example "magnet" or "triangle".');
       return;
     }
     setSearching(true);
@@ -27,71 +30,63 @@ const SearchForm = ({ collections = [] }) => {
         state: {
           searchResults: response.data,
           searchMode: 'keyword',
-          searchParams: {
-            keyword: term,
-            collection: collections.find((c) => c.id === collection)?.title,
-          },
+          searchParams: { keyword: term, collection: collections.find((c) => c.id === collection)?.title },
         },
       });
     } catch (err) {
       console.error('Search error:', err);
-      setError('The search did not complete. Check your connection and try again.');
+      setError('The search did not finish. Check your connection and try again.');
     } finally {
       setSearching(false);
     }
   };
 
   return (
-    <div className="search-form-container bg-gray-900 rounded-xl shadow-lg p-8 max-w-2xl mx-auto font-alegreya-normal">
-      <form onSubmit={handleSearch} className="space-y-6" role="search" aria-label="Search the library">
-        <div role="alert">
-          {error && (
-            <div className="error-message bg-red-900/50 text-red-100 p-4 rounded-lg text-base font-poppins-normal">
-              {error}
-            </div>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="keyword" className="block text-white font-poppins-bold mb-2 text-lg">
-            Search for a diagram
-          </label>
-          <input
-            type="search"
-            id="keyword"
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            placeholder="For example: magnet, triangle, digestive system"
-            className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800 text-white font-alegreya-normal text-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder-gray-400"
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="collection" className="block text-white font-poppins-bold mb-2 text-lg">
-            Collection <span className="font-poppins-normal text-gray-300">(optional)</span>
-          </label>
-          <select
-            id="collection"
-            value={collection}
-            onChange={(e) => setCollection(e.target.value)}
-            className="w-full px-4 py-3 rounded-lg border border-gray-600 bg-gray-800 text-white font-alegreya-normal text-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
-          >
-            <option value="">All collections</option>
-            {collections.map((c) => (
-              <option key={c.id} value={c.id}>{c.title}</option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          type="submit"
-          disabled={searching}
-          className="w-full bg-yellow-500 hover:bg-yellow-600 disabled:opacity-60 text-black font-poppins-bold text-lg py-4 px-6 rounded-lg transition-colors shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-        >
+    <form onSubmit={handleSearch} role="search" aria-label="Library" className="card p-5 sm:p-6" noValidate>
+      <label htmlFor={`${id}-q`} className="field-label text-body">Search the library</label>
+      <p id={hintId} className="text-small text-muted mb-3">
+        Try a topic or object, for example magnet, triangle or digestive system.
+      </p>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <input
+          id={`${id}-q`}
+          type="search"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          aria-describedby={error ? `${hintId} ${errorId}` : hintId}
+          aria-invalid={error ? true : undefined}
+          className="field flex-1"
+          autoComplete="off"
+        />
+        <button type="submit" className="btn-primary" aria-disabled={searching}>
+          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2.5" />
+            <path d="M15.5 15.5 21 21" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
           {searching ? 'Searching…' : 'Search'}
         </button>
-      </form>
-    </div>
+      </div>
+
+      <div className="mt-4 max-w-sm">
+        <label htmlFor={`${id}-c`} className="field-label">Collection <span className="font-normal text-muted">(optional)</span></label>
+        <select id={`${id}-c`} value={collection} onChange={(e) => setCollection(e.target.value)} className="field">
+          <option value="">All collections</option>
+          {collections.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
+        </select>
+      </div>
+
+      <div role="alert">
+        {error && (
+          <p id={errorId} className="mt-4 flex items-start gap-2 font-bold text-error">
+            <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true" focusable="false" className="shrink-0 mt-0.5">
+              <circle cx="12" cy="12" r="10" fill="currentColor" />
+              <path d="M12 7v6M12 16.5v.5" stroke="var(--surface)" strokeWidth="2.5" strokeLinecap="round" />
+            </svg>
+            {error}
+          </p>
+        )}
+      </div>
+    </form>
   );
 };
 

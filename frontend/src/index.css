@@ -2,326 +2,165 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Existing font definitions remain the same */
-
-/* Comprehensive High Contrast Styles */
-body.high-contrast {
-  background-color: black !important;
-  color: yellow !important;
+/*
+ * Describe-it design tokens — see design/DESIGN_GUIDE.md.
+ * Components use these through Tailwind (bg-surface, text-ink, text-accent, ...),
+ * so every theme below restyles the whole site without touching components.
+ */
+:root {
+  --bg: #F6F4F0;            /* Stone */
+  --surface: #FFFFFF;
+  --ink: #1C1C1E;           /* Graphite */
+  --muted: #5A5650;         /* secondary text, 6.6:1 on Stone */
+  --accent: #1F5FBF;        /* Cobalt: actions, links, focus, logo dot */
+  --accent-hover: #174A96;
+  --accent-tint: #E6EEFA;
+  --on-accent: #FFFFFF;
+  --border: #D9D5CC;        /* decorative dividers only */
+  --control-border: #857F74;/* inputs and other controls, 3:1+ */
+  --success: #1E6B3A;
+  --error: #B3261E;
+  --logo-line: #1C1C1E;
+  --logo-dot: #1F5FBF;
+  --border-width: 1px;
+  --line-height: 1.6;
+  --word-spacing: normal;
+  --letter-spacing: normal;
+  color-scheme: light;
 }
 
-.high-contrast * {
-  color: yellow !important;
-  border-color: white !important;
-}
-
-.high-contrast a {
-  color: cyan !important;
-  text-decoration: underline !important;
-}
-
-.high-contrast img {
-  filter: grayscale(100%) contrast(200%) !important;
-}
-
-.high-contrast button {
-  background-color: yellow !important;
-  color: black !important;
-  border: 2px solid white !important;
-}
-
-.high-contrast select,
-.high-contrast input {
-  background-color: black !important;
-  color: yellow !important;
-  border: 2px solid yellow !important;
-}
-
-.high-contrast .bg-black {
-  background-color: black !important;
-}
-
-.high-contrast .bg-white {
-  background-color: black !important;
-}
-
-.high-contrast .text-white {
-  color: yellow !important;
-}
-
-.high-contrast .text-black {
-  color: yellow !important;
-}
-
-/* Reading Mode */
-.reading-mode {
-  font-family: "Georgia", serif !important;
-  line-height: 1.8 !important;
-  background-color: #f4f4e0 !important;
-  color: #333 !important;
-}
-
-.high-contrast svg {
-  filter: invert(1) !important; /* Invert SVG colors */
-  stroke: yellow !important; /* Ensure stroke color is yellow */
-  fill: yellow !important; /* Ensure fill color is yellow */
-}
-
-.font-poppins-thin {
-  font-family: "Poppins", sans-serif;
-  font-weight: 200;
-  font-style: normal;
-}
-
-.font-poppins-normal {
-  font-family: "Poppins", sans-serif;
-  font-weight: 400;
-  font-style: normal;
-}
-.font-poppins-bold{
-  font-family: "Poppins", sans-serif;
-  font-weight: 600;
-  font-style: normal;
-}
-.font-alegreya-normal {
-font-family: "Alegreya", serif;
-font-optical-sizing: auto;
-font-weight: 600;
-font-style: normal;
-}
-
-.font-alegreya-light {
-  font-family: "Alegreya", serif;
-  font-optical-sizing: auto;
-  font-weight: 400;
-  font-style: normal;
-}
-
-/* Search Form Styles */
-.search-form-container {
-  width: 100%;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.search-form-container h2 {
-  text-align: center;
-  color: #1a1a1a;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-.search-type-toggle {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.toggle-btn {
-  padding: 0.75rem 1.5rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background-color: white;
-  color: #4b5563;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.toggle-btn.active {
-  background-color: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #374151;
-  font-weight: 500;
-}
-
-.form-group select,
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
-  background-color: white;
-  color: #1f2937;
-  font-size: 1rem;
-  transition: border-color 0.2s ease;
-}
-
-.form-group select:focus,
-.form-group input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-group select:disabled {
-  background-color: #f3f4f6;
-  cursor: not-allowed;
-}
-
-.search-button {
-  width: 100%;
-  padding: 1rem;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.search-button:hover {
-  background-color: #2563eb;
-}
-
-.search-button:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
-
-/* High Contrast Mode Styles for Search Form */
-.high-contrast .search-form-container {
-  background-color: black !important;
-  border: 2px solid yellow !important;
-}
-
-.high-contrast .search-form-container h2 {
-  color: yellow !important;
-}
-
-.high-contrast .toggle-btn {
-  background-color: black !important;
-  color: yellow !important;
-  border-color: yellow !important;
-}
-
-.high-contrast .toggle-btn.active {
-  background-color: yellow !important;
-  color: black !important;
-  border-color: yellow !important;
-}
-
-.high-contrast .form-group label {
-  color: yellow !important;
-}
-
-.high-contrast .form-group select,
-.high-contrast .form-group input {
-  background-color: black !important;
-  color: yellow !important;
-  border-color: yellow !important;
-}
-
-.high-contrast .search-button {
-  background-color: yellow !important;
-  color: black !important;
-}
-
-.high-contrast .search-button:hover {
-  background-color: #ffff00 !important;
-}
-
-/* Reading Mode Styles for Search Form */
-.reading-mode .search-form-container {
-  background-color: #f4f4e0 !important;
-  font-family: "Georgia", serif !important;
-}
-
-.reading-mode .form-group select,
-.reading-mode .form-group input {
-  font-family: "Georgia", serif !important;
-  font-size: 1.1rem !important;
-}
-
-/* Navbar Positioning */
-.navbar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-  padding: 0.5rem 1rem;
-}
-
-.navbar-container {
-  position: relative; /* This allows absolute positioning of children */
-  width: 100%;
-  max-width: 1280px; /* or whatever max-width you prefer */
-  margin: 0 auto;
-  padding: 0 1rem;
-}
-
-.logo-container {
-  position: relative;
-  z-index: 41;
-}
-
-/* Accessibility Menu Positioning */
-.accessibility-menu {
-  position: absolute; /* Changed from fixed to absolute */
-  top: 50%;
-  right: 1.5rem;
-  transform: translateY(-50%);
-  z-index: 60;
-  background-color: rgba(0, 0, 0, 0.8);
-  border-radius: 0.5rem;
-  padding: 0.75rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-@media (max-width: 768px) {
-  .accessibility-menu {
-    right: 4rem; /* Space for mobile menu button */
+/* Dark theme: follows the system unless the viewer picked a theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --bg: #151517; --surface: #1F1F22; --ink: #F6F4F0; --muted: #A7A196;
+    --accent: #8DB4F5; --accent-hover: #B7CFF9; --accent-tint: #23314A; --on-accent: #151517;
+    --border: #3A3936; --control-border: #8F897F; --success: #7BD39A; --error: #FF8F87;
+    --logo-line: #F6F4F0; --logo-dot: #8DB4F5;
+    color-scheme: dark;
   }
-  
-  .navbar-container {
-    padding: 0 0.5rem;
+}
+:root[data-theme="dark"] {
+  --bg: #151517; --surface: #1F1F22; --ink: #F6F4F0; --muted: #A7A196;
+  --accent: #8DB4F5; --accent-hover: #B7CFF9; --accent-tint: #23314A; --on-accent: #151517;
+  --border: #3A3936; --control-border: #8F897F; --success: #7BD39A; --error: #FF8F87;
+  --logo-line: #F6F4F0; --logo-dot: #8DB4F5;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+/* High contrast: pure black and white, thicker borders */
+@media (prefers-contrast: more) {
+  :root:not([data-theme]) {
+    --bg: #FFFFFF; --surface: #FFFFFF; --ink: #000000; --muted: #000000;
+    --accent: #0B3F91; --accent-hover: #062A63; --accent-tint: #FFFFFF; --on-accent: #FFFFFF;
+    --border: #000000; --control-border: #000000; --logo-line: #000000; --logo-dot: #0B3F91;
+    --border-width: 2px;
+  }
+}
+:root[data-theme="contrast"] {
+  --bg: #000000; --surface: #000000; --ink: #FFFFFF; --muted: #FFFFFF;
+  --accent: #FFE066; --accent-hover: #FFF0A8; --accent-tint: #1A1A1A; --on-accent: #000000;
+  --border: #FFFFFF; --control-border: #FFFFFF; --success: #8CF5A8; --error: #FFA39E;
+  --logo-line: #FFFFFF; --logo-dot: #FFE066;
+  --border-width: 2px;
+  color-scheme: dark;
+}
+
+/* Text size and spacing settings (Display settings menu). Everything is in rem, so it all scales. */
+:root[data-text-size="large"] { font-size: 112.5%; }
+:root[data-text-size="larger"] { font-size: 125%; }
+:root[data-text-size="largest"] { font-size: 150%; }
+:root[data-spacing="wide"] { --line-height: 1.9; --word-spacing: 0.16em; --letter-spacing: 0.04em; }
+
+/* Base */
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  font-size: 1.125rem; /* 18px at default size */
+  line-height: var(--line-height);
+  word-spacing: var(--word-spacing);
+  letter-spacing: var(--letter-spacing);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 {
+  font-family: "Lexend", "Atkinson Hyperlegible", system-ui, sans-serif;
+  font-weight: 600;
+  color: var(--ink);
+  text-wrap: balance;
+}
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+
+/* Focus: always visible, 3px accent ring with 2px offset */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip link: hidden until focused */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 100;
+  padding: 0.75rem 1.25rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  border-radius: 10px;
+}
+.skip-link:focus { top: 1rem; color: var(--on-accent); }
+
+/* Reading width for descriptions and prose */
+.prose-measure { max-width: 68ch; }
+
+/* Motion: short and calm; none at all when the viewer asks for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
-/* Main content positioning */
-.main-content {
-  position: relative;
-  z-index: 10;
+/* Windows High Contrast / forced colours: keep borders on controls and cards */
+@media (forced-colors: active) {
+  .card, button, input, select, textarea { border: 1px solid CanvasText; }
+  :focus-visible { outline: 3px solid Highlight; }
 }
 
-/* High Contrast Mode for Accessibility Menu */
-.high-contrast .accessibility-menu {
-  background-color: black !important;
-  border: 2px solid yellow !important;
+/* Components from the design guide (section 6) */
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] px-6 rounded-control bg-accent text-on-accent font-bold text-label no-underline transition-colors duration-150;
+  }
+  .btn-primary:hover { @apply bg-accent-hover text-on-accent; }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 min-h-[48px] px-6 rounded-control border-2 border-ink bg-surface text-ink font-bold text-label no-underline transition-colors duration-150;
+  }
+  .btn-secondary:hover { @apply border-accent text-accent; }
+  .field {
+    @apply block w-full min-h-[48px] px-4 rounded-control border-2 border-control bg-surface text-ink text-body;
+  }
+  .field:focus { @apply border-accent; }
+  .field-label { @apply block mb-2 font-bold text-small text-ink; }
+  .card { @apply bg-surface border-theme border-line rounded-card; }
+  .chip {
+    @apply inline-flex items-center gap-1 min-h-[28px] px-3 rounded-full border border-control text-caption text-ink bg-surface;
+  }
+  .page { @apply max-w-content mx-auto px-4 sm:px-6 py-10; }
 }
 
-/* Reading Mode for Accessibility Menu */
-.reading-mode .accessibility-menu {
-  background-color: #f4f4e0 !important;
-  font-family: "Georgia", serif !important;
-}
-.image-upload-title {
-  font-family: 'Poppins', sans-serif;
-  font-weight: 600; /* You can adjust this weight as needed */
-  font-style: normal;
-}
-
-.image-upload-para {
-  font-family: 'Alegreya', serif;
+/* Legacy font classes still used by pages not yet redesigned (tools, account pages) */
+.font-poppins-thin, .font-poppins-normal, .font-alegreya-normal, .font-alegreya-light {
+  font-family: "Atkinson Hyperlegible", system-ui, sans-serif;
   font-weight: 400;
-  font-style: normal;
+}
+.font-poppins-bold {
+  font-family: "Lexend", system-ui, sans-serif;
+  font-weight: 600;
 }

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
-import AccessibilityMenu from '../components/AccessibilityMenu';
 import ImageCard from '../components/ImageCard';
 import { getCollections, getCollectionImages } from '../api/config';
 
@@ -34,77 +33,56 @@ const CollectionPage = () => {
         if (cancelled) return;
         setError(err.response?.status === 404
           ? 'This collection does not exist.'
-          : 'The images did not load. Check your connection and try again.');
+          : 'The diagrams did not load. Check your connection and try again.');
       });
     return () => { cancelled = true; };
   }, [id, page]);
 
+  const title = info?.title || 'Collection';
+  useEffect(() => { document.title = `${title}${page > 1 ? `, page ${page}` : ''} | Describe-it`; }, [title, page]);
+
   // After a page change, move focus to the heading so screen readers announce where they are
-  useEffect(() => {
-    if (result) headingRef.current?.focus();
-  }, [result]);
+  useEffect(() => { if (result) headingRef.current?.focus(); }, [result]);
 
   const goTo = (n) => setSearchParams({ page: String(n) });
-  const title = info?.title || 'Collection';
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <AccessibilityMenu />
-      <main className="max-w-7xl mx-auto px-6 pt-20 pb-12">
-        <nav aria-label="Breadcrumb" className="mb-4 text-base">
-          <Link to="/" className="text-yellow-800 dark:text-yellow-400 underline">Home</Link>
-          <span aria-hidden="true" className="mx-2 text-gray-500">/</span>
-          <span className="text-gray-700 dark:text-gray-300">{title}</span>
+    <div className="page">
+      <nav aria-label="Breadcrumb" className="mb-4 text-small">
+        <ol className="flex flex-wrap gap-2 list-none p-0 m-0">
+          <li><Link to="/collections">Collections</Link><span aria-hidden="true" className="ml-2 text-muted">/</span></li>
+          <li aria-current="page" className="text-muted">{title}</li>
+        </ol>
+      </nav>
+
+      <h1 ref={headingRef} tabIndex={-1} className="text-h1 focus:outline-none">{title}</h1>
+      {info?.description && <p className="mt-2 text-muted prose-measure">{info.description}</p>}
+
+      <p role="status" className="my-6 font-bold">
+        {!result && !error && 'Loading diagrams… The server can take up to a minute to wake up.'}
+        {result && `${result.total.toLocaleString('en-IN')} diagrams${result.pages > 1 ? `, page ${result.page} of ${result.pages}` : ''}`}
+      </p>
+      {error && <p role="alert" className="text-error font-bold">{error}</p>}
+
+      {result && (result.data.length === 0 ? (
+        <p className="text-muted">This collection has no diagrams yet.</p>
+      ) : (
+        <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 list-none p-0 m-0">
+          {result.data.map((image) => <ImageCard key={image._id} image={image} />)}
+        </ul>
+      ))}
+
+      {result && result.pages > 1 && (
+        <nav aria-label="Pages" className="mt-10 flex flex-wrap items-center justify-center gap-4">
+          <button type="button" onClick={() => goTo(page - 1)} disabled={page <= 1} className="btn-secondary disabled:opacity-40 disabled:cursor-not-allowed">
+            Previous page
+          </button>
+          <span className="font-bold">Page {result.page} of {result.pages}</span>
+          <button type="button" onClick={() => goTo(page + 1)} disabled={page >= result.pages} className="btn-secondary disabled:opacity-40 disabled:cursor-not-allowed">
+            Next page
+          </button>
         </nav>
-
-        <h1
-          ref={headingRef}
-          tabIndex={-1}
-          className="text-3xl font-bold text-gray-900 dark:text-yellow-400 focus:outline-none"
-        >
-          {title}
-          {result && <span className="ml-3 text-lg font-normal text-gray-600 dark:text-gray-300">{result.total} diagrams</span>}
-        </h1>
-        {info?.description && <p className="mt-2 mb-6 text-gray-700 dark:text-gray-300 max-w-3xl">{info.description}</p>}
-
-        <div role="status" className="my-4 text-gray-700 dark:text-gray-300">
-          {!result && !error && 'Loading diagrams… The server can take up to a minute to wake up.'}
-          {result && result.pages > 1 && `Page ${result.page} of ${result.pages}`}
-        </div>
-        {error && <p role="alert" className="text-red-700 dark:text-red-300">{error}</p>}
-
-        {result && (
-          result.data.length === 0 ? (
-            <p className="text-gray-700 dark:text-gray-300">This collection has no diagrams yet.</p>
-          ) : (
-            <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 list-none p-0">
-              {result.data.map((image) => <ImageCard key={image._id} image={image} />)}
-            </ul>
-          )
-        )}
-
-        {result && result.pages > 1 && (
-          <nav aria-label="Pages" className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={() => goTo(page - 1)}
-              disabled={page <= 1}
-              className="px-5 py-2 rounded-lg bg-yellow-500 text-black font-bold disabled:opacity-40"
-            >
-              Previous page
-            </button>
-            <span className="text-gray-800 dark:text-gray-200">Page {result.page} of {result.pages}</span>
-            <button
-              type="button"
-              onClick={() => goTo(page + 1)}
-              disabled={page >= result.pages}
-              className="px-5 py-2 rounded-lg bg-yellow-500 text-black font-bold disabled:opacity-40"
-            >
-              Next page
-            </button>
-          </nav>
-        )}
-      </main>
+      )}
     </div>
   );
 };
