@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import ImageCard from '../components/ImageCard';
+import { EmptyIcon } from '../components/Motion';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -38,9 +39,12 @@ const SearchResults = () => {
       <p className="mt-4 mb-8"><Link to="/" className="font-bold">New search</Link></p>
 
       {count === 0 ? (
-        <div className="card p-6 prose-measure">
+        <div className="card p-6 prose-measure flex flex-col sm:flex-row gap-5 items-start">
+          <EmptyIcon />
+          <div>
           <h2 className="text-h3 mb-2">No diagrams matched</h2>
           <p className="text-muted">Try a shorter or different word, or search all collections.</p>
+          </div>
         </div>
       ) : (
         <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 list-none p-0 m-0">

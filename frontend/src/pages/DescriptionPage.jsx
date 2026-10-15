@@ -7,6 +7,7 @@ import { Download } from 'lucide-react';
 
 import HTMLparser from "../components/HTMLparser";
 import { figureLabel } from "../lib/figures";
+import { LoadingStatus, SavedIcon } from "../components/Motion";
 import { getImageDescription, updateUserReview, getPdfDownloadUrl } from "../api/config";
 
 const DescriptionPage = () => {
@@ -303,7 +304,7 @@ const DescriptionPage = () => {
   }
 
   if (loading) {
-    return <p role="status" className="page">Loading the diagram…</p>;
+    return <div className="page"><LoadingStatus>Loading the diagram…</LoadingStatus></div>;
   }
 
   if (error) {
@@ -393,7 +394,10 @@ const DescriptionPage = () => {
                 )}
               </div>
             )}
-            <p aria-live="polite" className="mt-3 text-small text-success font-bold min-h-[1.5em]">{actionStatus}</p>
+            <p aria-live="polite" className="mt-3 flex items-center gap-2 text-small text-success font-bold min-h-[1.75rem]">
+              {actionStatus === 'Description copied.' && <SavedIcon key={Date.now()} size={22} />}
+              {actionStatus}
+            </p>
           </section>
 
           <section aria-labelledby="feedback-heading" className="card p-6">
@@ -423,7 +427,8 @@ const DescriptionPage = () => {
               />
               <div role="alert">
                 {reviewStatus.message && (
-                  <p id="feedback-status" className={`mt-2 font-bold ${reviewStatus.type === 'error' ? 'text-error' : 'text-success'}`}>
+                  <p id="feedback-status" className={`mt-2 flex items-center gap-2 font-bold ${reviewStatus.type === 'error' ? 'text-error' : 'text-success'}`}>
+                    {reviewStatus.type === 'success' && <SavedIcon size={22} />}
                     {reviewStatus.message}
                   </p>
                 )}

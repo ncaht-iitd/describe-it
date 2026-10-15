@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import ImageCard from '../components/ImageCard';
+import { LoadingStatus, EmptyIcon } from '../components/Motion';
 import { getCollections, getCollectionImages } from '../api/config';
 
 const PAGE_SIZE = 24;
@@ -58,14 +59,14 @@ const CollectionPage = () => {
       <h1 ref={headingRef} tabIndex={-1} className="text-h1 focus:outline-none">{title}</h1>
       {info?.description && <p className="mt-2 text-muted prose-measure">{info.description}</p>}
 
-      <p role="status" className="my-6 font-bold">
-        {!result && !error && 'Loading diagrams… The server can take up to a minute to wake up.'}
+      {!result && !error && <div className="my-6"><LoadingStatus>Loading diagrams… The server can take up to a minute to wake up.</LoadingStatus></div>}
+      <p role="status" className={result ? 'my-6 font-bold' : 'sr-only'}>
         {result && `${result.total.toLocaleString('en-IN')} diagrams${result.pages > 1 ? `, page ${result.page} of ${result.pages}` : ''}`}
       </p>
       {error && <p role="alert" className="text-error font-bold">{error}</p>}
 
       {result && (result.data.length === 0 ? (
-        <p className="text-muted">This collection has no diagrams yet.</p>
+        <div className="flex items-center gap-4 text-muted"><EmptyIcon size={56} /> This collection has no diagrams yet.</div>
       ) : (
         <ul className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 list-none p-0 m-0">
           {result.data.map((image) => <ImageCard key={image._id} image={image} />)}

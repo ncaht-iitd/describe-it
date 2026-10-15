@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import { getCollections } from '../api/config';
 import CollectionCard from '../components/CollectionCard';
 import ImageUploadComponent from '../forms/ImageUpload';
+import { ToolList } from '../components/FeatureCards';
+import { LoadingStatus } from '../components/Motion';
 
 const usePageTitle = (title) => useEffect(() => { document.title = `${title} | Describe-it`; }, [title]);
 
@@ -23,10 +25,8 @@ export function CollectionsIndex() {
   return (
     <div className="page">
       <PageHeader title="Collections" intro="Each collection groups diagrams from one source. Open one to browse every diagram in it." />
-      <p role="status" className="text-muted">
-        {error ? 'The collections did not load. Reload the page to try again.'
-          : collections.length === 0 && 'Loading collections… The server can take up to a minute to wake up.'}
-      </p>
+      {error && <p role="alert" className="text-error font-bold">The collections did not load. Reload the page to try again.</p>}
+      {!error && collections.length === 0 && <LoadingStatus>Loading collections… The server can take up to a minute to wake up.</LoadingStatus>}
       <ul className="grid gap-6 md:grid-cols-3 list-none p-0 m-0">
         {collections.map((c) => <CollectionCard key={c.id} collection={c} headingLevel="h2" />)}
       </ul>
@@ -34,27 +34,12 @@ export function CollectionsIndex() {
   );
 }
 
-const TOOLS = [
-  ['/describe-image', 'Describe an image', 'Upload one diagram and get an AI-written description. You can then request a tactile version.'],
-  ['/image-description-generator', 'Describe many images', 'Upload a batch of images or a ZIP file and download all descriptions as a spreadsheet.'],
-  ['/file-extractor', 'Extract images from a PDF', 'Pull every image out of a textbook PDF so you can describe them.'],
-];
-
 export function Tools() {
   usePageTitle('Tools');
   return (
     <div className="page">
       <PageHeader title="Tools" intro="Make your own teaching material accessible. AI-written descriptions are drafts: always check them before sharing." />
-      <ul className="grid gap-6 md:grid-cols-3 list-none p-0 m-0">
-        {TOOLS.map(([to, title, text]) => (
-          <li key={to} className="card relative p-6 hover:border-accent focus-within:border-accent">
-            <h2 className="text-h3 mb-2">
-              <Link to={to} className="text-ink no-underline hover:underline after:absolute after:inset-0">{title}</Link>
-            </h2>
-            <p className="text-small text-muted">{text}</p>
-          </li>
-        ))}
-      </ul>
+      <ToolList headingLevel="h2" />
     </div>
   );
 }
