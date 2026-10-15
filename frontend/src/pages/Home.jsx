@@ -27,7 +27,7 @@ function Home() {
   }, []);
 
   const aboutRef = useRef(null);
-  const whyVisionTextRef = useRef(null);
+  const whyDescribeItRef = useRef(null);
   const contactRef = useRef(null);
 
   const navigate = useNavigate();
@@ -38,9 +38,9 @@ function Home() {
     }
   };
 
-  const scrollToWhyVisionText = () => {
-    if (whyVisionTextRef.current) {
-      whyVisionTextRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+  const scrollToWhyDescribeIt = () => {
+    if (whyDescribeItRef.current) {
+      whyDescribeItRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   };
 
@@ -58,7 +58,7 @@ function Home() {
       <Navbar 
         scrollToAbout={scrollToAbout} 
         scrollToContact={scrollToContact}
-        scrollToWhyVisionText={scrollToWhyVisionText}
+        scrollToWhyDescribeIt={scrollToWhyDescribeIt}
       />
       <AccessibilityMenu className="accessibility-menu" />
       
@@ -339,7 +339,7 @@ function Home() {
 
       {/* About Section */}
       <div ref={aboutRef}>
-        <AboutUs whyVisionTextRef={whyVisionTextRef} />
+        <AboutUs whyDescribeItRef={whyDescribeItRef} />
       </div>
 
       {/* Contact Section */}

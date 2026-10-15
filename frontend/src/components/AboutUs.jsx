@@ -31,7 +31,7 @@ const useCountUp = (target, duration = 2, shouldStart = false) => {
   return count;
 };
 
-export default function AboutUs({ whyVisionTextRef }) {
+export default function AboutUs({ whyDescribeItRef }) {
     const [startCounting, setStartCounting] = useState(false);
     const count1 = useCountUp(98, 2, startCounting);
     const count2 = useCountUp(2, 2, startCounting);
@@ -110,8 +110,8 @@ export default function AboutUs({ whyVisionTextRef }) {
           </div>
         </div>
   
-        {/* === Why VisionText Section === */}
-        <div ref={whyVisionTextRef}>
+        {/* === Why Describe-it section === */}
+        <div ref={whyDescribeItRef}>
           <motion.div 
             className="bg-gradient-to-b from-gray-800 to-gray-900 py-32"
             onViewportEnter={() => setStartCounting(true)}
@@ -125,7 +125,7 @@ export default function AboutUs({ whyVisionTextRef }) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.8 }}
               >
-                Why <span className="text-white">VisionText?</span>
+                Why <span className="text-white">Describe-it?</span>
               </motion.h2>
     
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-12 text-white text-center">
@@ -222,7 +222,7 @@ export default function AboutUs({ whyVisionTextRef }) {
                 transition={{ duration: 1, delay: 0.2 }}
                 viewport={{ once: true }}
               >
-                VisionText bridges the accessibility gap in education — turning
+                Describe-it bridges the accessibility gap in education — turning
                 complex visual content into inclusive, meaningful learning for all.
               </motion.p>
             </div>

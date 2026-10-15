@@ -303,7 +303,7 @@ const DescriptionPage = () => {
       {loading && <LoadingSpinner />}
       <div 
         className={`min-h-screen flex flex-col items-center justify-center bg-white dark:bg-gray-900 ${loading ? 'opacity-50 pointer-events-none' : ''}`}
-        aria-label="VisionText Description Page"
+        aria-label="Describe-it description page"
       >
         <AccessibilityMenu />
         
@@ -313,7 +313,7 @@ const DescriptionPage = () => {
             className="font-poppins-bold text-2xl text-yellow-500 hover:text-yellow-600 transition-colors"
             aria-label="Go to homepage"
           >
-            VisionText
+            Describe-it
           </a>
         </div>
 

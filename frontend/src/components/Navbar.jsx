@@ -4,7 +4,7 @@ import { Headset, LogOut, User } from "lucide-react";
 import PropTypes from 'prop-types';
 import { isLoggedIn, logout } from '../services/appwriteService';
 
-function Navbar({ scrollToAbout, scrollToContact, scrollToWhyVisionText }) {
+function Navbar({ scrollToAbout, scrollToContact, scrollToWhyDescribeIt }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userLoggedIn, setUserLoggedIn] = useState(false);
@@ -43,9 +43,9 @@ function Navbar({ scrollToAbout, scrollToContact, scrollToWhyVisionText }) {
     setIsMobileMenuOpen(false);
   };
 
-  const handleVisionTextClick = (e) => {
+  const handleLogoClick = (e) => {
     e.preventDefault();
-    scrollToWhyVisionText();
+    scrollToWhyDescribeIt();
     setIsMobileMenuOpen(false);
   };
 
@@ -66,10 +66,10 @@ function Navbar({ scrollToAbout, scrollToContact, scrollToWhyVisionText }) {
           {/* Logo with positioning class */}
           <div className="logo-container md:w-auto w-full text-center md:text-left">
             <button 
-              onClick={handleVisionTextClick}
+              onClick={handleLogoClick}
               className="text-yellow-400 hover:text-yellow-300 text-2xl font-poppins-normal"
             >
-              <span className="text-white">Vision</span>Text
+              <span className="text-white">Describe</span>-it
             </button>
           </div>
           
@@ -207,7 +207,7 @@ function Navbar({ scrollToAbout, scrollToContact, scrollToWhyVisionText }) {
 Navbar.propTypes = {
   scrollToAbout: PropTypes.func.isRequired,
   scrollToContact: PropTypes.func.isRequired,
-  scrollToWhyVisionText: PropTypes.func.isRequired,
+  scrollToWhyDescribeIt: PropTypes.func.isRequired,
 };
 
 export default Navbar;
