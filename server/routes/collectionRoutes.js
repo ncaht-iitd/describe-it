@@ -24,13 +24,29 @@ function collectionFilter(id) {
     : { dataset: id };
 }
 
+const PREVIEW_SIZE = 6;
+const SORT = { subject: 1, standard: 1, 'chapter.number': 1, image_name: 1 };
+
+/** A few images spread evenly through a collection, so the preview shows its range. */
+async function previewImages(filter, count) {
+  const slots = Math.min(PREVIEW_SIZE, count);
+  const picks = await Promise.all(Array.from({ length: slots }, async (_, i) => {
+    // Take the first record with an image file at or just after this slot's position
+    const records = await LibraryRecord.find(filter).sort(SORT).skip(Math.floor((i * count) / slots)).limit(3);
+    const doc = records.map(withMedia).find((r) => r.image_url);
+    return doc && { _id: doc._id, image_name: doc.image_name, image_url: doc.image_url };
+  }));
+  return picks.filter(Boolean);
+}
+
 router.get('/collections', async (req, res) => {
   try {
     const list = [...Object.entries(COLLECTIONS).map(([id, c]) => ({ id, ...c })), TACTILE];
-    const withCounts = await Promise.all(list.map(async (c) => ({
-      ...c,
-      count: await LibraryRecord.countDocuments(collectionFilter(c.id)),
-    })));
+    const withCounts = await Promise.all(list.map(async (c) => {
+      const filter = collectionFilter(c.id);
+      const count = await LibraryRecord.countDocuments(filter);
+      return { ...c, count, preview: await previewImages(filter, count) };
+    }));
     res.json({ success: true, data: withCounts });
   } catch (error) {
     console.error('Error listing collections:', error);

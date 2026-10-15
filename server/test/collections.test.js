@@ -67,3 +67,12 @@ test("keyword search matches the subject name", async () => {
   const res = await request(app).post("/api/search").send({ keyword: "science", collection: "ncert-science" }).expect(200);
   assert.equal(res.body.count, 2);
 });
+
+test("each collection comes with preview images that have working links", async () => {
+  const res = await request(app).get("/api/collections").expect(200);
+  for (const c of res.body.data) {
+    assert.ok(Array.isArray(c.preview), c.id);
+    assert.ok(c.preview.length <= 6, c.id);
+    assert.ok(c.preview.every((p) => p.image_url && p.image_url.startsWith("/media/")), c.id);
+  }
+});
