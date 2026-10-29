@@ -14,3 +14,9 @@ describe-it-audit.md
 .DS_Store
 Thumbs.db
 *.log
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc

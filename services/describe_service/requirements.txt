@@ -1,0 +1,10 @@
+# Describe service (run from the services folder; includes the shared describeit_models package)
+fastapi==0.162.0
+uvicorn[standard]==0.54.0
+python-dotenv==1.2.4
+openai==3.41.0
+anthropic==2.3.0
+google-genai==2.34.0
+# tests
+pytest==9.2.0
+httpx==0.28.1
