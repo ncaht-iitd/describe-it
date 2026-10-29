@@ -13,12 +13,12 @@
     <script>
       // Apply saved display settings before the page draws, so it never flashes the wrong theme.
       try {
-        var t = localStorage.getItem('di-theme');
-        if (t && t !== 'system') document.documentElement.setAttribute('data-theme', t);
-        var s = localStorage.getItem('di-text-size');
-        if (s) document.documentElement.setAttribute('data-text-size', s);
-        var sp = localStorage.getItem('di-spacing');
-        if (sp) document.documentElement.setAttribute('data-spacing', sp);
+        var r = document.documentElement, g = function (k) { return localStorage.getItem(k); };
+        var t = g('di-theme'); if (t && t !== 'system') r.setAttribute('data-theme', t);
+        var z = g('di-text-scale'); if (z && z !== '100') r.style.fontSize = z + '%';
+        var lh = g('di-line-height'); if (lh) r.style.setProperty('--line-height', lh);
+        var ws = g('di-word-spacing'); if (ws && ws !== '0') r.style.setProperty('--word-spacing', ws + 'em');
+        if (g('di-reading') === 'on') r.setAttribute('data-reading', 'on');
       } catch (e) {}
     </script>
   </head>

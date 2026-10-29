@@ -97,7 +97,7 @@ export function AccessibilityStatement() {
         </p>
         <h2 className="text-h2 pt-4">What you can do</h2>
         <ul className="list-disc pl-6 space-y-2">
-          <li>Use the <strong>Display</strong> button at the top of every page to choose light, dark or high-contrast colours, larger text or wider spacing. Your choice is remembered in this browser.</li>
+          <li>Use the <strong>Accessibility</strong> button at the top of every page to change text size, line and word spacing, choose light, dark or high-contrast colours, or turn on reading mode, which stops all animation. Your choice is remembered in this browser.</li>
           <li>Zoom the page up to 400% without losing content.</li>
           <li>Use every feature with a keyboard. The first Tab on any page offers “Skip to content”.</li>
         </ul>

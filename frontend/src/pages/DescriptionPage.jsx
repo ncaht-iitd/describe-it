@@ -8,6 +8,7 @@ import { Download } from 'lucide-react';
 import HTMLparser from "../components/HTMLparser";
 import { figureLabel } from "../lib/figures";
 import { LoadingStatus, SavedIcon } from "../components/Motion";
+import DescriptionGenerator from "../components/DescriptionGenerator";
 import { getImageDescription, updateUserReview, getPdfDownloadUrl } from "../api/config";
 
 const DescriptionPage = () => {
@@ -25,6 +26,8 @@ const DescriptionPage = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState(imageDataFromSearch?.description || "");
   const [reviews, setReviews] = useState(imageDataFromSearch?.reviews || []);
+  const [altText, setAltText] = useState(imageDataFromSearch?.alt_text || "");
+  const [savedMeta, setSavedMeta] = useState(imageDataFromSearch?.description_meta || null);
   
   // UI state
   const [userReview, setUserReview] = useState("");
@@ -347,7 +350,7 @@ const DescriptionPage = () => {
             {imgUrl ? (
               <img
                 src={imgUrl}
-                alt={title || 'Diagram'}
+                alt={altText || title || 'Diagram'}
                 aria-describedby={description ? 'image-description' : undefined}
                 className="w-full max-h-[32rem] object-contain"
               />
@@ -379,11 +382,22 @@ const DescriptionPage = () => {
         <div className="space-y-6">
           <section aria-labelledby="description-heading" className="card p-6">
             <h2 id="description-heading" className="text-h2 mb-4">Description</h2>
+            {altText && (
+              <div className="mb-4 p-3 rounded-control bg-accent-tint">
+                <p className="text-caption font-bold uppercase tracking-wide text-muted">Alt text</p>
+                <p>{altText}</p>
+              </div>
+            )}
             <div id="image-description" className="prose-measure text-body-lg">
               {description
                 ? <HTMLparser htmlString={description} />
-                : <p className="italic text-muted">Description not written yet.</p>}
+                : <p className="italic text-muted">Description not written yet. Generate one below.</p>}
             </div>
+            {savedMeta?.model_label && (
+              <p className="mt-3 text-caption text-muted">
+                Written with {savedMeta.model_label}{savedMeta.saved_at ? `, saved ${new Date(savedMeta.saved_at).toLocaleDateString('en-IN', { dateStyle: 'medium' })}` : ''}.
+              </p>
+            )}
             {description && (
               <div className="mt-6 flex flex-wrap gap-3">
                 <button type="button" className="btn-secondary" onClick={handleCopy}>Copy</button>
@@ -400,44 +414,54 @@ const DescriptionPage = () => {
             </p>
           </section>
 
-          <section aria-labelledby="feedback-heading" className="card p-6">
-            <h2 id="feedback-heading" className="text-h3 mb-2">Feedback on this description</h2>
-            <p className="text-small text-muted mb-4">Is something missing, unclear or wrong? Tell us and we will improve it.</p>
+          {imageDataFromSearch._id && (
+            <DescriptionGenerator
+              recordId={imageDataFromSearch._id}
+              onSaved={(gen) => {
+                setDescription(gen.long_description);
+                setAltText(gen.alt_text);
+                setSavedMeta({ model_label: gen.model?.label, saved_at: new Date().toISOString() });
+              }}
+            />
+          )}
 
-            {reviews.length > 0 && (
-              <details className="mb-4">
-                <summary className="cursor-pointer font-bold text-accent">Read feedback from others ({reviews.length})</summary>
-                <ul className="mt-3 space-y-3 list-none p-0">
+          {/* Feedback is secondary: one line that opens a small form */}
+          <details className="text-small">
+            <summary className="cursor-pointer font-bold text-accent inline-flex items-center min-h-[44px]">
+              Report a problem with this description{reviews.length > 0 ? ` (${reviews.length} reported)` : ''}
+            </summary>
+            <div className="card p-4 mt-2">
+              {reviews.length > 0 && (
+                <ul className="mb-3 space-y-2 list-none p-0">
                   {reviews.map((review, idx) => (
-                    <li key={idx} className="p-3 rounded-control bg-accent-tint">{review}</li>
+                    <li key={idx} className="p-2 rounded-control bg-accent-tint">{review}</li>
                   ))}
                 </ul>
-              </details>
-            )}
-
-            <form onSubmit={handleUserReview} noValidate>
-              <label htmlFor="feedback-text" className="field-label">Your feedback</label>
-              <textarea
-                id="feedback-text"
-                value={userReview}
-                onChange={(e) => setUserReview(e.target.value)}
-                rows={4}
-                className="field py-3 min-h-[7rem]"
-                aria-describedby={reviewStatus.message ? 'feedback-status' : undefined}
-              />
-              <div role="alert">
-                {reviewStatus.message && (
-                  <p id="feedback-status" className={`mt-2 flex items-center gap-2 font-bold ${reviewStatus.type === 'error' ? 'text-error' : 'text-success'}`}>
-                    {reviewStatus.type === 'success' && <SavedIcon size={22} />}
-                    {reviewStatus.message}
-                  </p>
-                )}
-              </div>
-              <button type="submit" className="btn-primary mt-4" aria-disabled={reviewStatus.type === 'loading'}>
-                {reviewStatus.type === 'loading' ? 'Sending…' : 'Send feedback'}
-              </button>
-            </form>
-          </section>
+              )}
+              <form onSubmit={handleUserReview} noValidate>
+                <label htmlFor="feedback-text" className="field-label">What is missing, unclear or wrong?</label>
+                <textarea
+                  id="feedback-text"
+                  value={userReview}
+                  onChange={(e) => setUserReview(e.target.value)}
+                  rows={3}
+                  className="field py-2 min-h-[5rem] text-small"
+                  aria-describedby={reviewStatus.message ? 'feedback-status' : undefined}
+                />
+                <div role="alert">
+                  {reviewStatus.message && (
+                    <p id="feedback-status" className={`mt-2 flex items-center gap-2 font-bold ${reviewStatus.type === 'error' ? 'text-error' : 'text-success'}`}>
+                      {reviewStatus.type === 'success' && <SavedIcon size={20} />}
+                      {reviewStatus.message}
+                    </p>
+                  )}
+                </div>
+                <button type="submit" className="btn-secondary mt-3 min-h-[44px]" aria-disabled={reviewStatus.type === 'loading'}>
+                  {reviewStatus.type === 'loading' ? 'Sending…' : 'Send'}
+                </button>
+              </form>
+            </div>
+          </details>
         </div>
       </div>
 

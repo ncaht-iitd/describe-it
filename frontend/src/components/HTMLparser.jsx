@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 
 const HTMLparser = ({ htmlString }) => {
   return (
-    <div className="text-left ">
+    <div className="rich-text text-left">
       {parse(marked.parse(htmlString))}
     </div>
   );

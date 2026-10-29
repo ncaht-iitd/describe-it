@@ -219,3 +219,56 @@ export const getPdfDownloadUrl = async (grade, subject, chapter, figNo, image_na
 };
 
 export default getImageDescription;
+// ---------- Description generation ----------
+// Signed-in users send a short-lived Appwrite token so the server can check admin rights.
+let cachedJwt = null;
+async function authHeaders() {
+  if (cachedJwt && cachedJwt.expires > Date.now()) return { Authorization: `Bearer ${cachedJwt.jwt}` };
+  try {
+    const { account } = await import('../services/appwriteService');
+    const { jwt } = await account.createJWT();
+    cachedJwt = { jwt, expires: Date.now() + 10 * 60 * 1000 }; // tokens last 15 minutes; renew after 10
+    return { Authorization: `Bearer ${jwt}` };
+  } catch {
+    return {}; // not signed in
+  }
+}
+
+const errorMessage = (err, fallback) => err.response?.data?.error || fallback;
+
+export async function getMe() {
+  const res = await axios.get(`${baseURI}/api/me`, { headers: await authHeaders() });
+  return res.data.user;
+}
+
+export async function getDescribeModels() {
+  const res = await axios.get(`${baseURI}/api/describe/models`);
+  return res.data.models;
+}
+
+export async function getDescriptionHistory(recordId) {
+  const res = await axios.get(`${baseURI}/api/records/${recordId}/descriptions`);
+  return res.data.data;
+}
+
+export async function generateDescriptionFor(recordId, model) {
+  try {
+    const res = await axios.post(`${baseURI}/api/records/${recordId}/descriptions`, { model }, { timeout: 150000 });
+    return res.data.data;
+  } catch (err) {
+    throw new Error(errorMessage(err, 'The description could not be generated. Try again or choose another model.'));
+  }
+}
+
+export async function saveDescriptionToLibrary(recordId, generationId) {
+  try {
+    const res = await axios.post(
+      `${baseURI}/api/records/${recordId}/descriptions/${generationId}/save`,
+      {},
+      { headers: await authHeaders() },
+    );
+    return res.data.data;
+  } catch (err) {
+    throw new Error(errorMessage(err, 'The description could not be saved. Try again.'));
+  }
+}

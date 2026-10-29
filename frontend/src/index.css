@@ -66,11 +66,14 @@
   color-scheme: dark;
 }
 
-/* Text size and spacing settings (Display settings menu). Everything is in rem, so it all scales. */
-:root[data-text-size="large"] { font-size: 112.5%; }
-:root[data-text-size="larger"] { font-size: 125%; }
-:root[data-text-size="largest"] { font-size: 150%; }
-:root[data-spacing="wide"] { --line-height: 1.9; --word-spacing: 0.16em; --letter-spacing: 0.04em; }
+/* Accessibility menu: text size (root font-size), line and word spacing (variables) are set
+   by DisplaySettings.jsx. Everything is in rem, so it all scales. Reading mode: */
+:root[data-reading="on"] *, :root[data-reading="on"] *::before, :root[data-reading="on"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+:root[data-reading="on"] .reveal-pending { opacity: 1; transform: none; }
+:root[data-reading="on"] a { text-decoration: underline !important; }
 
 /* Base */
 body {
@@ -113,6 +116,12 @@ a:hover { color: var(--accent-hover); }
   border-radius: 10px;
 }
 .skip-link:focus { top: 1rem; color: var(--on-accent); }
+
+/* Descriptions (Markdown rendered by HTMLparser): keep paragraph and list spacing */
+.rich-text > * + * { margin-top: 0.85em; }
+.rich-text ul { list-style: disc; padding-left: 1.4em; }
+.rich-text ol { list-style: decimal; padding-left: 1.4em; }
+.rich-text li + li { margin-top: 0.3em; }
 
 /* Reading width for descriptions and prose */
 .prose-measure { max-width: 68ch; }
