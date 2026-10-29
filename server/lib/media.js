@@ -76,12 +76,18 @@ function withMedia(record) {
 }
 
 /** The image as a data URL, for sending to the AI model (works without a public URL). */
-function imageDataUrl(record) {
+/** The image file as base64 plus its media type, or null when there is no file. */
+function imageBase64(record) {
   const file = imageFile(record);
   if (!file) return null;
   const bytes = fs.readFileSync(path.join(MEDIA_DIR, file.folder, file.name));
-  const type = /\.jpe?g$/i.test(file.name) ? 'image/jpeg' : 'image/png';
-  return `data:${type};base64,${bytes.toString('base64')}`;
+  const mediaType = /\.jpe?g$/i.test(file.name) ? 'image/jpeg' : 'image/png';
+  return { base64: bytes.toString('base64'), mediaType };
+}
+
+function imageDataUrl(record) {
+  const img = imageBase64(record);
+  return img ? `data:${img.mediaType};base64,${img.base64}` : null;
 }
 
 /** Image names that have a tactile PDF, as stored in records (".png" form). */
@@ -91,5 +97,5 @@ function tactileImageNames() {
 
 module.exports = {
   COLLECTIONS, DEFAULT_COLLECTION, MEDIA_DIR,
-  withMedia, imageDataUrl, tactileImageNames, collectionOf, reload,
+  withMedia, imageBase64, imageDataUrl, tactileImageNames, collectionOf, reload,
 };

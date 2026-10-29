@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const imageRoutes = require('./routes/imageRoutes');
 const collectionRoutes = require('./routes/collectionRoutes');
+const descriptionRoutes = require('./routes/descriptionRoutes');
 const userUploadsRoutes = require('./routes/userUploads'); 
 const LibraryRecord = require('./models/LibraryRecord');
 const { withMedia } = require('./lib/media');
@@ -13,6 +14,8 @@ require("dotenv").config();
 
 // Initialize Express app
 const app = express();
+// Render sits behind a proxy; trust it so rate limits see each visitor's real address
+app.set('trust proxy', 1);
 
 // Basic Middleware
 app.use(express.json());
@@ -55,6 +58,7 @@ app.use((req, res, next) => {
 // API routes
 app.use('/api', imageRoutes);
 app.use('/api', collectionRoutes);
+app.use('/api', descriptionRoutes);
 app.use('/api', userUploadsRoutes);
 
 // PDF Download route

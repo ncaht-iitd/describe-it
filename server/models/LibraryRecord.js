@@ -12,6 +12,16 @@ const LibraryRecordSchema = new mongoose.Schema({
   },
   book: { type: String, required: true },
   description: { type: String, default: '' },
+  // Short alternative text (one sentence); empty for records written before description generation
+  alt_text: { type: String, default: '' },
+  // Where the current description came from, when it was saved from a generated draft
+  description_meta: {
+    generation_id: { type: mongoose.Schema.Types.ObjectId, ref: 'GeneratedDescription' },
+    model_label: String,
+    prompt_version: String,
+    saved_at: Date,
+    saved_by: String,
+  },
   fig_no: { type: String, required: false },
   reviews: { type: Array, default: [] },
   keywords: { type: [String], default: [] },
